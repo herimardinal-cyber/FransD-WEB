@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getProjectBySlug, getRelatedProjects, projects } from '@/data';
+import { getDbProjectBySlug, getDbRelatedProjects, getDbAllProjects } from '@/lib/db-queries';
 import ProjectPhotoGrid from '@/components/gallery/ProjectPhotoGrid';
 import { ArrowLeft, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
@@ -14,14 +14,15 @@ interface GalleryDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  return projects.map((p) => ({
+  const all = await getDbAllProjects();
+  return all.map((p) => ({
     slug: p.slug,
   }));
 }
 
 export async function generateMetadata({ params }: GalleryDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getDbProjectBySlug(slug);
 
   if (!project) {
     return {
@@ -49,13 +50,13 @@ export async function generateMetadata({ params }: GalleryDetailPageProps): Prom
 
 export default async function GalleryDetailPage({ params }: GalleryDetailPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getDbProjectBySlug(slug);
 
   if (!project) {
     notFound();
   }
 
-  const relatedProjects = getRelatedProjects(slug, 2);
+  const relatedProjects = await getDbRelatedProjects(slug, 2);
 
   return (
     <article className="min-h-screen bg-[#080808] text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">

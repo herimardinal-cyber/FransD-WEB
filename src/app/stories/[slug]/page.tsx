@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getStoryBySlug, getRelatedStories, stories } from '@/data';
+import { getDbStoryBySlug, getDbRelatedStories, getDbAllStories } from '@/lib/db-queries';
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
 interface StoryDetailPageProps {
@@ -13,14 +13,15 @@ interface StoryDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  return stories.map((s) => ({
+  const all = await getDbAllStories();
+  return all.map((s) => ({
     slug: s.slug,
   }));
 }
 
 export async function generateMetadata({ params }: StoryDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const story = getStoryBySlug(slug);
+  const story = await getDbStoryBySlug(slug);
 
   if (!story) {
     return {
@@ -50,13 +51,13 @@ export async function generateMetadata({ params }: StoryDetailPageProps): Promis
 
 export default async function StoryDetailPage({ params }: StoryDetailPageProps) {
   const { slug } = await params;
-  const story = getStoryBySlug(slug);
+  const story = await getDbStoryBySlug(slug);
 
   if (!story) {
     notFound();
   }
 
-  const relatedStories = getRelatedStories(slug, 2);
+  const relatedStories = await getDbRelatedStories(slug, 2);
   const formattedDate = new Date(story.publishedAt).toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',

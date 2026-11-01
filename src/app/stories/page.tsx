@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { getAllStories } from '@/data';
+import { getDbAllStories } from '@/lib/db-queries';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description: 'Reflections on the craft of light, field journals from remote expeditions, and philosophical essays by fine art photographer Frans Delian.',
 };
 
-export default function StoriesPage() {
-  const allStories = getAllStories();
+export default async function StoriesPage() {
+  const allStories = await getDbAllStories();
   const featuredStory = allStories[0];
   const remainingStories = allStories.slice(1);
 

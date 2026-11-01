@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getEventBySlug, events } from '@/data';
+import { getDbEventBySlug, getDbAllEvents } from '@/lib/db-queries';
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Ticket, User } from 'lucide-react';
 
 interface EventDetailPageProps {
@@ -13,14 +13,15 @@ interface EventDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  return events.map((e) => ({
+  const all = await getDbAllEvents();
+  return all.map((e) => ({
     slug: e.slug,
   }));
 }
 
 export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getDbEventBySlug(slug);
 
   if (!event) {
     return {
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getDbEventBySlug(slug);
 
   if (!event) {
     notFound();

@@ -20,6 +20,7 @@ export default function ContactForm() {
     message: '',
   });
 
+  const [honeypot, setHoneypot] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [ticketId, setTicketId] = useState('');
@@ -63,14 +64,30 @@ export default function ContactForm() {
       return;
     }
 
-    // Simulate backend response
     setStatus('submitting');
-    setTimeout(() => {
-      // Generated simulated reference ID
-      const generatedId = `FD-${Math.floor(100000 + Math.random() * 900000)}`;
-      setTicketId(generatedId);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          honeypot,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to submit inquiry. Please try again.');
+      }
+
+      setTicketId(data.referenceId || `FD-${Math.floor(100000 + Math.random() * 900000)}`);
       setStatus('success');
-    }, 1200);
+    } catch (err: unknown) {
+      setStatus('error');
+      setErrorMessage(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    }
   };
 
   const handleReset = () => {
@@ -81,6 +98,7 @@ export default function ContactForm() {
       subject: '',
       message: '',
     });
+    setHoneypot('');
     setStatus('idle');
     setTicketId('');
     setErrorMessage('');
@@ -93,13 +111,13 @@ export default function ContactForm() {
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-[#C6AA7B] mb-2">
-          Inquiry Dispatched (Simulated)
+          Inquiry Dispatched Successfully
         </span>
         <h3 className="font-serif text-3xl text-[#F2EFE9] mb-4">
           Thank you, {formData.name.split(' ')[0]}
         </h3>
         <p className="text-[#A7A7A7] text-sm leading-relaxed mb-6">
-          Your message has been received by Frans Delian Studio. We personally review every inquiry and typically respond within two business days.
+          Your message has been safely received by Frans Delian Studio and logged into our archive. We personally review every inquiry and typically respond within two business days.
         </p>
         <div className="bg-[#171717] border border-[#262626] px-5 py-3 rounded text-xs font-mono text-[#A7A7A7] mb-8">
           Inquiry Reference: <span className="text-[#C6AA7B] font-semibold">{ticketId}</span>
@@ -117,6 +135,20 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto space-y-6">
+      {/* Honeypot field (hidden from real users) */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
+
       {status === 'error' && errorMessage && (
         <div className="bg-red-950/40 border border-red-800/60 p-4 text-red-200 text-xs flex items-center gap-3">
           <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
@@ -222,11 +254,6 @@ export default function ContactForm() {
         />
       </div>
 
-      {/* Notice */}
-      <p className="text-[11px] text-[#717171] leading-relaxed">
-        Phase 1 Note: This form performs front-end client verification with simulated dispatch. Database persistence via MySQL/Prisma will be connected in Phase 2.
-      </p>
-
       {/* Submit Button */}
       <div className="pt-2">
         <button
@@ -250,4 +277,3 @@ export default function ContactForm() {
     </form>
   );
 }
-

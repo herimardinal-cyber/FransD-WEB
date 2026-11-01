@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getAllProjects } from '@/data';
+import { getDbAllProjects } from '@/lib/db-queries';
 import GalleryGrid from '@/components/gallery/GalleryGrid';
 
 export const metadata: Metadata = {
@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description: 'Explore the complete photographic archive of Frans Delian. Curated collections spanning Landscape, Portraiture, Street, and Documentary assignments worldwide.',
 };
 
-export default function GalleryPage() {
-  const allProjects = getAllProjects('All');
+export default async function GalleryPage() {
+  const allProjects = await getDbAllProjects('All');
 
   return (
     <div className="pt-32 pb-24 sm:pb-32 bg-[#080808] min-h-screen text-[#F2EFE9]">
