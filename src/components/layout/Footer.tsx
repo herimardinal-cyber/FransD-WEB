@@ -1,9 +1,17 @@
+'use client';
+
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { profile, siteSettings } from '@/data';
 import { ArrowUpRight } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
   return (
     <footer className="border-t border-[#262626] bg-[#080808] text-[#F2EFE9] pt-20 pb-12 transition-colors">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">

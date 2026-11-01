@@ -40,6 +40,10 @@ export default function Navigation() {
     };
   }, [mobileMenuOpen]);
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
