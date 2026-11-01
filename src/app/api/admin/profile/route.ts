@@ -44,31 +44,31 @@ export async function PUT(request: NextRequest) {
 
     const updated = existing
       ? await prisma.photographerProfile.update({
-          where: { id: existing.id },
-          data: {
-            displayName: finalName,
-            tagline: tagline || 'Stories Beyond The Frame',
-            biography: finalBio,
-            philosophy: finalPhilosophy,
-            portraitImageUrl: finalPortrait,
-            location: location || 'Zurich, Switzerland',
-            email: email || 'studio@fransdelian.com',
-            phone: phone || '+41 44 210 88 44',
-          },
-        })
+        where: { id: existing.id },
+        data: {
+          displayName: finalName,
+          tagline: tagline || 'Stories Beyond The Frame',
+          biography: finalBio,
+          philosophy: finalPhilosophy,
+          portraitImageUrl: finalPortrait,
+          location: location || 'Zurich, Switzerland',
+          email: email || 'studio@fransdelian.com',
+          phone: phone || '+41 44 210 88 44',
+        },
+      })
       : await prisma.photographerProfile.create({
-          data: {
-            id: 'default',
-            displayName: finalName,
-            tagline: tagline || 'Stories Beyond The Frame',
-            biography: finalBio,
-            philosophy: finalPhilosophy,
-            portraitImageUrl: finalPortrait,
-            location: location || 'Zurich, Switzerland',
-            email: email || 'studio@fransdelian.com',
-            phone: phone || '+41 44 210 88 44',
-          },
-        });
+        data: {
+          id: 'default',
+          displayName: finalName,
+          tagline: tagline || 'Stories Beyond The Frame',
+          biography: finalBio,
+          philosophy: finalPhilosophy,
+          portraitImageUrl: finalPortrait,
+          location: location || 'Zurich, Switzerland',
+          email: email || 'studio@fransdelian.com',
+          phone: phone || '+41 44 210 88 44',
+        },
+      });
 
     await recordAuditLog(admin.id, 'UPDATE_PROFILE', 'PhotographerProfile', updated.id, {
       name: finalName,

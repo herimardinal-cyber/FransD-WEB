@@ -47,3 +47,4 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleaning backups older than ${RETENTION_DAY
 find "${BACKUP_DIR}" -type f -name "frans_delian_*.sql.gz" -mtime +"${RETENTION_DAYS}" -delete
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Backup process complete."
+

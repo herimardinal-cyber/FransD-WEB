@@ -99,11 +99,10 @@ export default function MessagesManager({
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
-              filter === tab
-                ? 'bg-[#1C1A17] text-[#C6AA7B] border border-[#C6AA7B]/40 font-semibold'
-                : 'text-[#717171] hover:text-[#F2EFE9] bg-[#121212]'
-            }`}
+            className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${filter === tab
+              ? 'bg-[#1C1A17] text-[#C6AA7B] border border-[#C6AA7B]/40 font-semibold'
+              : 'text-[#717171] hover:text-[#F2EFE9] bg-[#121212]'
+              }`}
           >
             {tab} ({messages.filter((m) => tab === 'ALL' || m.status === tab).length})
           </button>
@@ -131,11 +130,10 @@ export default function MessagesManager({
                       handleUpdateStatus(msg.id, 'READ');
                     }
                   }}
-                  className={`p-4 cursor-pointer transition-colors ${
-                    isSelected
-                      ? 'bg-[#1C1A17] border-l-2 border-[#C6AA7B]'
-                      : 'hover:bg-[#161616]'
-                  }`}
+                  className={`p-4 cursor-pointer transition-colors ${isSelected
+                    ? 'bg-[#1C1A17] border-l-2 border-[#C6AA7B]'
+                    : 'hover:bg-[#161616]'
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <span className="font-serif text-sm text-[#F2EFE9] truncate font-medium">

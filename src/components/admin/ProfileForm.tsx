@@ -126,11 +126,10 @@ export default function ProfileForm({ initialData }: { initialData?: ProfileData
 
       {message && (
         <div
-          className={`p-4 border text-xs flex items-center gap-3 ${
-            message.type === 'success'
-              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
-              : 'bg-red-950/40 border-red-800/60 text-red-300'
-          }`}
+          className={`p-4 border text-xs flex items-center gap-3 ${message.type === 'success'
+            ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
+            : 'bg-red-950/40 border-red-800/60 text-red-300'
+            }`}
         >
           {message.type === 'success' ? (
             <CheckCircle2 className="w-4 h-4 shrink-0" />

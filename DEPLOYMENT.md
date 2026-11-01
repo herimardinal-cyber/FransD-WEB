@@ -290,3 +290,4 @@ Add this line to run backups every night at 02:30 AM:
 | View Nginx error log | `sudo tail -f /var/log/nginx/error.log` |
 | Manual database backup | `./scripts/backup-db.sh` |
 | Database restore | `./scripts/restore-db.sh /var/backups/frans-delian/frans_delian_TIMESTAMP.sql.gz` |
+

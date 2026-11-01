@@ -46,3 +46,4 @@ else
 fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Database restore complete."
+

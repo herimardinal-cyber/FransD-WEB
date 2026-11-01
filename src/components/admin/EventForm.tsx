@@ -402,3 +402,4 @@ export default function EventForm({ initialData }: { initialData?: EventData }) 
     </div>
   );
 }
+

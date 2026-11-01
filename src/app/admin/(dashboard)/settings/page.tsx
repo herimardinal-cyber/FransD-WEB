@@ -10,3 +10,4 @@ export default async function AdminSettingsPage() {
 
   return <SettingsForm initialSettings={settingsMap} />;
 }
+
