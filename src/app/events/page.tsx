@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { getUpcomingEvents, getPastEvents } from '@/data';
+import { getDbUpcomingEvents, getDbPastEvents } from '@/lib/db-queries';
 import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -10,9 +10,12 @@ export const metadata: Metadata = {
   description: 'Upcoming gallery exhibitions, retrospective museum installations, and residential masterclasses by Frans Delian across Europe and Asia.',
 };
 
-export default function EventsPage() {
-  const upcomingEvents = getUpcomingEvents();
-  const pastEvents = getPastEvents();
+export default async function EventsPage() {
+  const [upcomingEvents, pastEvents] = await Promise.all([
+    getDbUpcomingEvents(),
+    getDbPastEvents(),
+  ]);
+
 
   return (
     <div className="pt-32 pb-24 sm:pb-32 bg-[#080808] min-h-screen text-[#F2EFE9]">

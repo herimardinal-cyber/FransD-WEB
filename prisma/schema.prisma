@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         String         @default("ADMIN")
+  isActive     Boolean        @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  auditLogs    AuditLog[]
+
+  @@map("admin_users")
+}
+
+model AdminSession {
+  id          String    @id @default(cuid())
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  @@index([adminUserId])
+  @@index([tokenHash])
+  @@map("admin_sessions")
+}
+
+model PhotoProject {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String    @db.Text
+  longDescription String?   @db.Text
+  category        String
+  year            Int       @default(2025)
+  location        String?
+  client          String?
+  coverImageId    String?
+  coverImage      Photo?    @relation("ProjectCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  status          String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  featured        Boolean   @default(false)
+  sortOrder       Int       @default(0)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  photos          Photo[]   @relation("ProjectPhotos")
+
+  @@index([slug])
+  @@index([status])
+  @@index([featured])
+  @@map("photo_projects")
+}
+
+model Photo {
+  id             String         @id @default(cuid())
+  projectId      String?
+  project        PhotoProject?  @relation("ProjectPhotos", fields: [projectId], references: [id], onDelete: Cascade)
+  coverProjects  PhotoProject[] @relation("ProjectCover")
+  coverStories   Story[]        @relation("StoryCover")
+  coverEvents    Event[]        @relation("EventCover")
+  eventGalleries Event[]        @relation("EventGalleryPhotos")
+  url            String         @db.VarChar(1000)
+  storageKey     String?
+  altText        String         @default("")
+  caption        String?        @db.Text
+  width          Int            @default(1800)
+  height         Int            @default(1200)
+  aspectRatio    String?        @default("landscape")
+  camera         String?
+  lens           String?
+  focalLength    String?
+  aperture       String?
+  shutterSpeed   String?
+  iso            String?
+  sortOrder      Int            @default(0)
+  createdAt      DateTime       @default(now())
+
+  @@index([projectId])
+  @@map("photos")
+}
+
+model Story {
+  id           String    @id @default(cuid())
+  title        String
+  slug         String    @unique
+  excerpt      String    @db.Text
+  body         String    @db.LongText
+  coverImageId String?
+  coverImage   Photo?    @relation("StoryCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  status       String    @default("DRAFT") // DRAFT, PUBLISHED
+  category     String    @default("Field Notes")
+  readTime     String    @default("5 min read")
+  tags         String?
+  quoteText    String?   @db.Text
+  quoteAuthor  String?
+  publishedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@map("stories")
+}
+
+model Event {
+  id           String    @id @default(cuid())
+  title        String
+  slug         String    @unique
+  description  String    @db.Text
+  venue        String
+  city         String
+  country      String
+  eventType    String    @default("Solo Exhibition")
+  curator      String?
+  entryFee     String?
+  startsAt     DateTime
+  endsAt       DateTime
+  scheduleJson String?   @db.Text
+  coverImageId String?
+  coverImage   Photo?    @relation("EventCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  photos       Photo[]   @relation("EventGalleryPhotos")
+  status       String    @default("UPCOMING") // UPCOMING, ONGOING, PAST
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@map("events")
+}
+
+model PhotographerProfile {
+  id                   String   @id @default("default")
+  displayName          String   @default("Frans Delian")
+  tagline              String   @default("Stories Beyond The Frame")
+  biography            String   @db.LongText
+  philosophy           String   @db.LongText
+  portraitImageUrl     String?  @db.VarChar(1000)
+  secondaryPortraitUrl String?  @db.VarChar(1000)
+  email                String   @default("studio@fransdelian.com")
+  phone                String   @default("+41 44 210 88 44")
+  location             String   @default("Zurich, Switzerland & Worldwide")
+  socialLinksJson      String?  @db.Text
+  awardsJson           String?  @db.Text
+  exhibitionsJson      String?  @db.Text
+  gearJson             String?  @db.Text
+  updatedAt            DateTime @updatedAt
+
+  @@map("photographer_profiles")
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("site_settings")
+}
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  inquiryType String   @default("Editorial & Assignment")
+  subject     String
+  message     String   @db.Text
+  status      String   @default("UNREAD") // UNREAD, READ, ARCHIVED, REPLIED
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
+}
+
+model AuditLog {
+  id          String     @id @default(cuid())
+  adminUserId String?
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  details     String?    @db.Text
+  createdAt   DateTime   @default(now())
+
+  @@index([adminUserId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -2,7 +2,8 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getFeaturedProjects, getAllStories, getUpcomingEvents, profile, siteSettings } from '@/data';
+import { getDbFeaturedProjects, getDbAllStories, getDbUpcomingEvents } from '@/lib/db-queries';
+import { profile, siteSettings } from '@/data';
 import { ArrowDown, ArrowUpRight, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -10,10 +11,14 @@ export const metadata: Metadata = {
   description: 'Fine art and documentary photography portfolio by Frans Delian. Capturing cinematic landscapes, human portraits, and timeless visual narratives.',
 };
 
-export default function HomePage() {
-  const featuredProjects = getFeaturedProjects();
-  const recentStories = getAllStories().slice(0, 3);
-  const upcomingEvents = getUpcomingEvents().slice(0, 2);
+export default async function HomePage() {
+  const [featuredProjects, stories, events] = await Promise.all([
+    getDbFeaturedProjects(),
+    getDbAllStories(),
+    getDbUpcomingEvents(),
+  ]);
+  const recentStories = stories.slice(0, 3);
+  const upcomingEvents = events.slice(0, 2);
 
   return (
     <div className="w-full bg-[#080808] text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
