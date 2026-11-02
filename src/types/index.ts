@@ -76,7 +76,7 @@ export interface Event {
   endsAt: string;
   coverImage: Photo;
   status: 'UPCOMING' | 'PAST' | 'ONGOING';
-  eventType: 'Solo Exhibition' | 'Masterclass' | 'Artist Talk' | 'Photo Walk';
+  eventType: 'Solo Exhibition' | 'Masterclass' | 'Artist Talk' | 'Photo Walk' | (string & {});
   curator?: string;
   entryFee?: string;
   photos?: Photo[];

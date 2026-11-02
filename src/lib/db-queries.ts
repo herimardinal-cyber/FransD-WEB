@@ -140,10 +140,7 @@ function mapPrismaEvent(e: PrismaEventWithCover): Event {
         sortOrder: 0,
       };
 
-  const validTypes = ['Solo Exhibition', 'Masterclass', 'Artist Talk', 'Photo Walk'] as const;
-  const eventType = validTypes.includes(e.eventType as (typeof validTypes)[number])
-    ? (e.eventType as (typeof validTypes)[number])
-    : 'Solo Exhibition';
+  const eventType = e.eventType || 'Solo Exhibition';
 
   let schedule: { time: string; activity: string }[] | undefined;
   if (e.scheduleJson) {
@@ -344,6 +341,41 @@ export async function getDbAllEvents(): Promise<Event[]> {
   }
 
   return mockEvents;
+}
+
+export async function getDbLandingEvents(limit = 4): Promise<Event[]> {
+  try {
+    // 1. Fetch upcoming / ongoing events first (ascending by date)
+    const upcoming = await prisma.event.findMany({
+      where: {
+        status: { in: ['UPCOMING', 'ONGOING'] },
+      },
+      include: { coverImage: true },
+      orderBy: { startsAt: 'asc' },
+    });
+
+    // 2. Fetch past events (descending, most recent first)
+    const past = await prisma.event.findMany({
+      where: {
+        status: 'PAST',
+      },
+      include: { coverImage: true },
+      orderBy: { startsAt: 'desc' },
+    });
+
+    // Combine: active events first, then recent exhibitions
+    const combined = [...upcoming, ...past].slice(0, limit);
+    if (combined && combined.length > 0) {
+      return combined.map(mapPrismaEvent);
+    }
+  } catch (error) {
+    console.warn('Falling back to static landing events:', error);
+  }
+
+  const allMock = [...mockEvents].sort(
+    (a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()
+  );
+  return allMock.slice(0, limit);
 }
 
 export async function getDbUpcomingEvents(): Promise<Event[]> {

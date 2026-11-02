@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getDbFeaturedProjects, getDbAllStories, getDbUpcomingEvents } from '@/lib/db-queries';
+import { getDbFeaturedProjects, getDbAllStories, getDbLandingEvents } from '@/lib/db-queries';
 import { profile, siteSettings } from '@/data';
 import { ArrowDown, ArrowUpRight, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
@@ -15,10 +15,10 @@ export default async function HomePage() {
   const [featuredProjects, stories, events] = await Promise.all([
     getDbFeaturedProjects(),
     getDbAllStories(),
-    getDbUpcomingEvents(),
+    getDbLandingEvents(4),
   ]);
   const recentStories = stories.slice(0, 3);
-  const upcomingEvents = events.slice(0, 2);
+  const landingEvents = events;
 
   return (
     <div className="w-full bg-[#080808] text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
@@ -355,7 +355,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-            {upcomingEvents.map((event) => {
+            {landingEvents.map((event) => {
               const startDate = new Date(event.startsAt).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -375,10 +375,15 @@ export default async function HomePage() {
                       sizes="(max-width: 768px) 100vw, 30vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute top-3 left-3">
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
                       <span className="text-[10px] uppercase font-mono tracking-widest px-2.5 py-1 bg-[#080808]/90 text-[#C6AA7B] border border-[#262626]">
                         {event.eventType}
                       </span>
+                      {event.status === 'PAST' && (
+                        <span className="text-[9px] uppercase font-mono tracking-widest px-2 py-0.5 bg-[#1C1A17] text-[#A7A7A7] border border-[#333]">
+                          Past
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -404,13 +409,24 @@ export default async function HomePage() {
                       href={`/events/${event.slug}`}
                       className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors pt-2"
                     >
-                      <span>Event Details & RSVP</span>
+                      <span>{event.status === 'PAST' ? 'View Archive & Details' : 'Event Details & RSVP'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
               );
             })}
+          </div>
+
+          {/* More Events Button */}
+          <div className="mt-14 sm:mt-16 flex justify-center">
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#141414] hover:bg-[#C6AA7B] text-[#F2EFE9] hover:text-[#080808] border border-[#2E2E2E] hover:border-[#C6AA7B] text-xs font-mono uppercase tracking-[0.22em] font-semibold transition-all duration-300 group shadow-lg"
+            >
+              <span>More Events...</span>
+              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
