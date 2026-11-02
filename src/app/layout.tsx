@@ -4,6 +4,7 @@ import './globals.css';
 import { siteSettings } from '@/data';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-serif',
@@ -75,9 +76,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#080808] text-[#F2EFE9] font-sans selection:bg-[#C6AA7B] selection:text-[#080808]">
-        <Navigation />
+        <LanguageProvider>
+          <Navigation />
         <main className="flex-1 w-full">{children}</main>
         <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

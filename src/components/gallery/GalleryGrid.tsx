@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PhotoProject, ProjectCategory } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 import { ArrowUpRight } from 'lucide-react';
 
 interface GalleryGridProps {
@@ -20,6 +21,7 @@ const CATEGORIES: ProjectCategory[] = [
 ];
 
 export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
 
   const filteredProjects = useMemo(() => {
@@ -40,6 +42,8 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
               ? initialProjects.length
               : initialProjects.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
 
+          const label = cat === 'All' ? t.gallery.filterAll : cat;
+
           return (
             <button
               key={cat}
@@ -50,7 +54,7 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
                   : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] hover:bg-[#262626] border border-[#262626]'
               }`}
             >
-              <span>{cat}</span>
+              <span>{label}</span>
               <span className={`ml-2 text-[10px] font-mono ${isSelected ? 'text-[#080808]/80' : 'text-[#717171]'}`}>
                 ({count})
               </span>
@@ -62,8 +66,8 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
         <div className="text-center py-24 text-[#A7A7A7]">
-          <p className="font-serif text-2xl text-[#F2EFE9] mb-2">No projects found</p>
-          <p className="text-sm">There are no archived projects in this category at the moment.</p>
+          <p className="font-serif text-2xl text-[#F2EFE9] mb-2">{t.gallery.noProjectsTitle}</p>
+          <p className="text-sm">{t.gallery.noProjectsDesc}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
@@ -117,7 +121,7 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
                     {project.description}
                   </p>
                   <div className="pt-1 text-[11px] font-mono text-[#717171]">
-                    {project.photos.length} Photographs
+                    {project.photos.length} {t.gallery.photosCount}
                   </div>
                 </div>
               </Link>
@@ -128,4 +132,3 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
     </div>
   );
 }
-

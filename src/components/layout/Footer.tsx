@@ -5,13 +5,17 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { profile, siteSettings } from '@/data';
 import { ArrowUpRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 
 export default function Footer() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   if (pathname?.startsWith('/admin')) {
     return null;
   }
+
   return (
     <footer className="border-t border-[#262626] bg-[#080808] text-[#F2EFE9] pt-20 pb-12 transition-colors">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -24,42 +28,47 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-xs uppercase tracking-[0.3em] text-[#C6AA7B] font-mono">
-              {siteSettings.tagline}
+              {t.footer.tagline}
             </p>
             <p className="text-[#A7A7A7] text-sm leading-relaxed max-w-sm pt-2">
-              Fine art & documentary photography dedicated to the architecture of silence, fleeting light, and human narratives across the globe.
+              {t.footer.desc}
             </p>
+
+            {/* Language Switcher in Brand Column */}
+            <div className="pt-2">
+              <LanguageSwitcher variant="footer" />
+            </div>
           </div>
 
           {/* Navigation Links */}
           <div className="md:col-span-3 flex flex-col space-y-4">
             <span className="text-[11px] uppercase tracking-[0.25em] text-[#C6AA7B] font-mono">
-              Explore
+              {t.footer.explore}
             </span>
             <ul className="space-y-2.5 text-sm text-[#A7A7A7]">
               <li>
                 <Link href="/gallery" className="hover:text-[#F2EFE9] transition-colors inline-block py-0.5">
-                  Gallery Archive
+                  {t.footer.galleryArchive}
                 </Link>
               </li>
               <li>
                 <Link href="/stories" className="hover:text-[#F2EFE9] transition-colors inline-block py-0.5">
-                  Visual Stories & Essays
+                  {t.footer.visualStories}
                 </Link>
               </li>
               <li>
                 <Link href="/events" className="hover:text-[#F2EFE9] transition-colors inline-block py-0.5">
-                  Exhibitions & Workshops
+                  {t.footer.exhibitions}
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-[#F2EFE9] transition-colors inline-block py-0.5">
-                  About & Philosophy
+                  {t.footer.aboutPhilosophy}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-[#F2EFE9] transition-colors inline-block py-0.5">
-                  Inquiries & Commissions
+                  {t.footer.inquiries}
                 </Link>
               </li>
             </ul>
@@ -68,7 +77,7 @@ export default function Footer() {
           {/* Connect & Social */}
           <div className="md:col-span-4 flex flex-col space-y-4">
             <span className="text-[11px] uppercase tracking-[0.25em] text-[#C6AA7B] font-mono">
-              Representation & Contact
+              {t.footer.representation}
             </span>
             <div className="text-sm text-[#A7A7A7] space-y-2">
               <p>Studio: Zurich, Switzerland</p>
@@ -83,7 +92,7 @@ export default function Footer() {
 
             <div className="pt-4">
               <span className="text-[11px] uppercase tracking-[0.25em] text-[#C6AA7B] font-mono block mb-3">
-                Social Networks
+                {t.footer.socialNetworks}
               </span>
               <div className="flex flex-wrap gap-4 text-xs tracking-wider uppercase text-[#A7A7A7]">
                 {profile.socialLinks.map((s) => (
@@ -104,13 +113,12 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#A7A7A7] space-y-4 sm:space-y-0">
-          <p>© {siteSettings.copyrightYear} Frans Delian. All rights reserved.</p>
+          <p>© {siteSettings.copyrightYear} Frans Delian. {t.footer.allRightsReserved}</p>
           <p className="text-[11px] tracking-widest text-[#717171]">
-            Curated Dark Editorial Edition — Phase 1 Frontend
+            {t.footer.edition}
           </p>
         </div>
       </div>
     </footer>
   );
 }
-

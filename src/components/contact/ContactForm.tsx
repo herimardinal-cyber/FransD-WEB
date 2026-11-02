@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface FormState {
   name: string;
@@ -12,10 +13,12 @@ interface FormState {
 }
 
 export default function ContactForm() {
+  const { t, language } = useLanguage();
+
   const [formData, setFormData] = useState<FormState>({
     name: '',
     email: '',
-    inquiryType: 'Editorial & Assignment',
+    inquiryType: language === 'id' ? 'Editorial & Liputan' : 'Editorial & Assignment',
     subject: '',
     message: '',
   });
@@ -41,26 +44,30 @@ export default function ContactForm() {
     // Basic frontend validations
     if (!formData.name.trim()) {
       setStatus('error');
-      setErrorMessage('Please enter your full name.');
+      setErrorMessage(language === 'id' ? 'Silakan masukkan nama lengkap Anda.' : 'Please enter your full name.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email.trim())) {
       setStatus('error');
-      setErrorMessage('Please provide a valid email address.');
+      setErrorMessage(language === 'id' ? 'Silakan masukkan alamat email yang valid.' : 'Please provide a valid email address.');
       return;
     }
 
     if (!formData.subject.trim()) {
       setStatus('error');
-      setErrorMessage('Please provide a subject for your inquiry.');
+      setErrorMessage(language === 'id' ? 'Silakan masukkan subjek pesan Anda.' : 'Please provide a subject for your inquiry.');
       return;
     }
 
     if (formData.message.trim().length < 15) {
       setStatus('error');
-      setErrorMessage('Please provide more details in your message (minimum 15 characters).');
+      setErrorMessage(
+        language === 'id'
+          ? 'Mohon jelaskan pesan Anda lebih rinci (minimal 15 karakter).'
+          : 'Please provide more details in your message (minimum 15 characters).'
+      );
       return;
     }
 
@@ -79,14 +86,20 @@ export default function ContactForm() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to submit inquiry. Please try again.');
+        throw new Error(data.error || (language === 'id' ? 'Gagal mengirim pesan. Silakan coba lagi.' : 'Failed to submit inquiry. Please try again.'));
       }
 
       setTicketId(data.referenceId || `FD-${Math.floor(100000 + Math.random() * 900000)}`);
       setStatus('success');
     } catch (err: unknown) {
       setStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : language === 'id'
+          ? 'Terjadi kesalahan sistem yang tidak terduga.'
+          : 'An unexpected error occurred.'
+      );
     }
   };
 
@@ -94,7 +107,7 @@ export default function ContactForm() {
     setFormData({
       name: '',
       email: '',
-      inquiryType: 'Editorial & Assignment',
+      inquiryType: language === 'id' ? 'Editorial & Liputan' : 'Editorial & Assignment',
       subject: '',
       message: '',
     });
@@ -111,23 +124,23 @@ export default function ContactForm() {
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-[#C6AA7B] mb-2">
-          Inquiry Dispatched Successfully
+          {t.contact.successTitle}
         </span>
         <h3 className="font-serif text-3xl text-[#F2EFE9] mb-4">
-          Thank you, {formData.name.split(' ')[0]}
+          {language === 'id' ? 'Terima kasih' : 'Thank you'}, {formData.name.split(' ')[0]}
         </h3>
         <p className="text-[#A7A7A7] text-sm leading-relaxed mb-6">
-          Your message has been safely received by Frans Delian Studio and logged into our archive. We personally review every inquiry and typically respond within two business days.
+          {t.contact.successDesc}
         </p>
         <div className="bg-[#171717] border border-[#262626] px-5 py-3 rounded text-xs font-mono text-[#A7A7A7] mb-8">
-          Inquiry Reference: <span className="text-[#C6AA7B] font-semibold">{ticketId}</span>
+          {t.contact.ticketLabel} <span className="text-[#C6AA7B] font-semibold">{ticketId}</span>
         </div>
         <button
           onClick={handleReset}
           className="inline-flex items-center gap-2 px-6 py-2.5 text-xs font-mono uppercase tracking-[0.2em] bg-[#171717] hover:bg-[#262626] text-[#F2EFE9] border border-[#262626] transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>Send Another Inquiry</span>
+          <span>{t.contact.sendAnother}</span>
         </button>
       </div>
     );
@@ -160,14 +173,14 @@ export default function ContactForm() {
         {/* Name */}
         <div className="space-y-2">
           <label htmlFor="name" className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
-            Full Name <span className="text-[#C6AA7B]">*</span>
+            {t.contact.fullName} <span className="text-[#C6AA7B]">*</span>
           </label>
           <input
             id="name"
             name="name"
             type="text"
             required
-            placeholder="e.g. Julian Vance"
+            placeholder={t.contact.fullNamePlaceholder}
             value={formData.name}
             onChange={handleChange}
             disabled={status === 'submitting'}
@@ -178,14 +191,14 @@ export default function ContactForm() {
         {/* Email */}
         <div className="space-y-2">
           <label htmlFor="email" className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
-            Email Address <span className="text-[#C6AA7B]">*</span>
+            {t.contact.email} <span className="text-[#C6AA7B]">*</span>
           </label>
           <input
             id="email"
             name="email"
             type="email"
             required
-            placeholder="e.g. julian@studio.com"
+            placeholder={t.contact.emailPlaceholder}
             value={formData.email}
             onChange={handleChange}
             disabled={status === 'submitting'}
@@ -198,7 +211,7 @@ export default function ContactForm() {
         {/* Inquiry Type */}
         <div className="space-y-2">
           <label htmlFor="inquiryType" className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
-            Nature of Inquiry
+            {t.contact.inquiryType}
           </label>
           <select
             id="inquiryType"
@@ -206,28 +219,37 @@ export default function ContactForm() {
             value={formData.inquiryType}
             onChange={handleChange}
             disabled={status === 'submitting'}
-            className="w-full bg-[#121212] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm rounded-none focus:outline-none transition-colors"
+            className="w-full bg-[#121212] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm rounded-none focus:outline-none transition-colors font-sans"
           >
-            <option value="Editorial & Assignment">Editorial & Assignment</option>
-            <option value="Commercial Campaign">Commercial Campaign</option>
-            <option value="Exhibition & Museum Curation">Exhibition & Museum Curation</option>
-            <option value="Limited Print Acquisition">Limited Print Acquisition</option>
-            <option value="Workshop & Masterclass">Workshop & Masterclass</option>
-            <option value="General Conversation">General Conversation</option>
+            <option value={language === 'id' ? 'Editorial & Liputan' : 'Editorial & Assignment'}>
+              {t.contact.types.editorial}
+            </option>
+            <option value={language === 'id' ? 'Akuisisi Cetakan Fine Art' : 'Print Acquisition'}>
+              {t.contact.types.print}
+            </option>
+            <option value={language === 'id' ? 'Pameran & Kuratorial' : 'Exhibition & Curation'}>
+              {t.contact.types.exhibition}
+            </option>
+            <option value={language === 'id' ? 'Komersial & Brand' : 'Commercial & Brand'}>
+              {t.contact.types.commercial}
+            </option>
+            <option value={language === 'id' ? 'Pertanyaan Umum' : 'General Inquiry'}>
+              {t.contact.types.other}
+            </option>
           </select>
         </div>
 
         {/* Subject */}
         <div className="space-y-2">
           <label htmlFor="subject" className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
-            Subject <span className="text-[#C6AA7B]">*</span>
+            {t.contact.subject} <span className="text-[#C6AA7B]">*</span>
           </label>
           <input
             id="subject"
             name="subject"
             type="text"
             required
-            placeholder="Brief subject summary"
+            placeholder={t.contact.subjectPlaceholder}
             value={formData.subject}
             onChange={handleChange}
             disabled={status === 'submitting'}
@@ -239,18 +261,18 @@ export default function ContactForm() {
       {/* Message */}
       <div className="space-y-2">
         <label htmlFor="message" className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
-          Message & Project Details <span className="text-[#C6AA7B]">*</span>
+          {t.contact.message} <span className="text-[#C6AA7B]">*</span>
         </label>
         <textarea
           id="message"
           name="message"
           rows={6}
           required
-          placeholder="Please describe project scope, proposed dates, locations, or print requirements..."
+          placeholder={t.contact.messagePlaceholder}
           value={formData.message}
           onChange={handleChange}
           disabled={status === 'submitting'}
-          className="w-full bg-[#121212] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm rounded-none focus:outline-none transition-colors resize-y"
+          className="w-full bg-[#121212] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm rounded-none focus:outline-none transition-colors resize-y leading-relaxed"
         />
       </div>
 
@@ -264,11 +286,11 @@ export default function ContactForm() {
           {status === 'submitting' ? (
             <>
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Transmitting Inquiry...</span>
+              <span>{t.contact.sending}</span>
             </>
           ) : (
             <>
-              <span>Send Inquiry</span>
+              <span>{t.contact.send}</span>
               <Send className="w-4 h-4" />
             </>
           )}

@@ -4,20 +4,23 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
-
-const NAV_ITEMS = [
-  { label: 'Home', href: '/' },
-  { label: 'Gallery', href: '/gallery' },
-  { label: 'Stories', href: '/stories' },
-  { label: 'Events', href: '/events' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-];
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { label: t.nav.home, href: '/' },
+    { label: t.nav.gallery, href: '/gallery' },
+    { label: t.nav.stories, href: '/stories' },
+    { label: t.nav.events, href: '/events' },
+    { label: t.nav.about, href: '/about' },
+    { label: t.nav.contact, href: '/contact' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,33 +72,39 @@ export default function Navigation() {
               Frans Delian
             </span>
             <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#A7A7A7] group-hover:text-[#F2EFE9] transition-colors duration-300 -mt-0.5">
-              Stories Beyond The Frame
+              {t.nav.tagline}
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8 lg:space-x-10" aria-label="Main Navigation">
-            {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative text-xs uppercase tracking-[0.22em] transition-colors duration-300 py-1 font-medium ${
-                    active ? 'text-[#C6AA7B]' : 'text-[#A7A7A7] hover:text-[#F2EFE9]'
-                  }`}
-                >
-                  {item.label}
-                  {active && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#C6AA7B] shadow-[0_0_8px_rgba(198,170,123,0.6)]" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Desktop Navigation & Language Switcher */}
+          <div className="hidden md:flex items-center space-x-8 lg:space-x-10">
+            <nav className="flex items-center space-x-8 lg:space-x-10" aria-label="Main Navigation">
+              {navItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`relative text-xs uppercase tracking-[0.22em] transition-colors duration-300 py-1 font-medium ${
+                      active ? 'text-[#C6AA7B]' : 'text-[#A7A7A7] hover:text-[#F2EFE9]'
+                    }`}
+                  >
+                    {item.label}
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#C6AA7B] shadow-[0_0_8px_rgba(198,170,123,0.6)]" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
 
-          {/* Mobile Menu Trigger */}
-          <div className="flex md:hidden items-center">
+            {/* Language Switcher on Header */}
+            <LanguageSwitcher variant="nav" />
+          </div>
+
+          {/* Mobile Right Controls: Language & Menu Trigger */}
+          <div className="flex md:hidden items-center gap-3">
+            <LanguageSwitcher variant="nav" />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C6AA7B]"
@@ -115,10 +124,14 @@ export default function Navigation() {
         }`}
       >
         <div className="flex flex-col space-y-6 pt-4">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6AA7B] mb-2 font-mono">
-            Navigation
-          </span>
-          {NAV_ITEMS.map((item, idx) => {
+          <div className="flex items-center justify-between pb-2 border-b border-[#222]">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6AA7B] font-mono">
+              Navigation
+            </span>
+            <LanguageSwitcher variant="mobile" />
+          </div>
+
+          {navItems.map((item, idx) => {
             const active = isActive(item.href);
             return (
               <Link
@@ -139,10 +152,10 @@ export default function Navigation() {
 
         <div className="border-t border-[#262626] pt-8 flex flex-col space-y-4">
           <div className="flex justify-between items-center text-xs tracking-wider text-[#A7A7A7]">
-            <span>Inquiries</span>
+            <span>{t.contact.title}</span>
             <a
               href="mailto:studio@fransdelian.com"
-              className="text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors flex items-center gap-1"
+              className="text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors flex items-center gap-1 font-mono text-xs"
             >
               studio@fransdelian.com
               <ArrowUpRight className="w-3 h-3" />
