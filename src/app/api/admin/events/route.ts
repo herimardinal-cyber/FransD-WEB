@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       const photo = await prisma.photo.create({
         data: {
           url: coverImage,
-          altText: title,
+          altText: (title || '').slice(0, 500),
         },
       });
       coverImageId = photo.id;

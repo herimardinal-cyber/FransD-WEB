@@ -65,7 +65,8 @@ export default function StoryForm({ initialData }: { initialData?: StoryData }) 
       const generatedSlug = title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 180);
       setFormData((prev) => ({ ...prev, title, slug: generatedSlug }));
     } else {
       setFormData((prev) => ({ ...prev, title }));

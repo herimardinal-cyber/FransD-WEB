@@ -79,7 +79,7 @@ export async function PUT(
       const photo = await prisma.photo.create({
         data: {
           url: coverImage,
-          altText: title || currentEvent.title,
+          altText: (title || currentEvent.title || '').slice(0, 500),
         },
       });
       coverImageId = photo.id;

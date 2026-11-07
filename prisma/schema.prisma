@@ -38,7 +38,7 @@ model AdminSession {
 
 model PhotoProject {
   id              String    @id @default(cuid())
-  title           String
+  title           String    @db.VarChar(500)
   slug            String    @unique
   description     String    @db.Text
   longDescription String?   @db.Text
@@ -72,7 +72,7 @@ model Photo {
   eventGalleries Event[]        @relation("EventGalleryPhotos")
   url            String         @db.VarChar(1000)
   storageKey     String?
-  altText        String         @default("")
+  altText        String         @default("") @db.Text
   caption        String?        @db.Text
   width          Int            @default(1800)
   height         Int            @default(1200)
@@ -92,7 +92,7 @@ model Photo {
 
 model Story {
   id           String    @id @default(cuid())
-  title        String
+  title        String    @db.VarChar(500)
   slug         String    @unique
   excerpt      String    @db.Text
   body         String    @db.LongText
@@ -101,7 +101,7 @@ model Story {
   status       String    @default("DRAFT") // DRAFT, PUBLISHED
   category     String    @default("Field Notes")
   readTime     String    @default("5 min read")
-  tags         String?
+  tags         String?   @db.Text
   quoteText    String?   @db.Text
   quoteAuthor  String?
   publishedAt  DateTime?
@@ -115,7 +115,7 @@ model Story {
 
 model Event {
   id           String    @id @default(cuid())
-  title        String
+  title        String    @db.VarChar(500)
   slug         String    @unique
   description  String    @db.Text
   venue        String
