@@ -34,3 +34,4 @@ export default function GalleryPageClient({ initialProjects }: GalleryPageClient
     </div>
   );
 }
+

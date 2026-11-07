@@ -338,26 +338,25 @@ const translations: Record<Language, Translations> = {
   },
   id: {
     nav: {
-      home: 'Beranda',
-      gallery: 'Galeri',
-      stories: 'Cerita',
-      events: 'Agenda',
-      about: 'Tentang',
-      contact: 'Kontak',
-      tagline: 'Cerita Melampaui Bingkai',
+      home: 'Home',
+      gallery: 'Gallery',
+      stories: 'Stories',
+      events: 'Events',
+      about: 'About',
+      contact: 'Contact',
+      tagline: 'Stories Beyond The Frame',
     },
     hero: {
-      badge: 'Fotografi Seni Murni & Dokumenter',
-      tagline: 'Cerita Melampaui Bingkai',
-      description:
-        'Menangkap keheningan lanskap purba, puitika cahaya alami yang sekilas, dan martabat abadi narasi manusia.',
+      badge: 'Fotografi & Dokumenter',
+      tagline: 'Stories Beyond The Frame',
+      description: 'Menangkap keheningan lanskap, puitika cahaya alami yang sekilas, dan martabat abadi narasi manusia.',
       exploreWork: 'Jelajahi Karya',
       artistProfile: 'Profil Fotografer',
-      scrollDiscover: 'Gulir untuk Menjelajahi',
+      scrollDiscover: 'Scroll untuk Menjelajahi',
     },
     home: {
       portfolio: 'Portofolio',
-      selectedWorks: 'Karya Terpilih',
+      selectedWorks: 'Selected Works',
       viewAllCollections: 'Lihat Semua Koleksi',
       viewProject: 'Lihat Proyek',
       artistAndPhilosophy: 'Fotografer & Filosofi',
@@ -384,14 +383,14 @@ const translations: Record<Language, Translations> = {
       ctaBadge: 'Komisi Karya & Akuisisi Cetakan',
       ctaTitle: 'Memiliki visi yang menuntut ketelitian visual abadi?',
       ctaDesc:
-        'Terbuka untuk penugasan editorial terpilih, pameran museum, kampanye visual berkelas, dan akuisisi cetakan seni ruang gelap di seluruh dunia.',
+        'Terbuka untuk penugasan editorial terpilih, pameran museum, kampanye visual, dan akuisisi cetakan seni ruang gelap di seluruh dunia.',
       initiateConversation: 'Mulai Percakapan',
     },
     gallery: {
       archive: 'Arsip Fotografi',
       title: 'Koleksi Visual',
       description:
-        'Setiap rangkaian karya foto merupakan buah perenungan berbulan-bulan dalam sunyi, meresapi cahaya, kontur bumi, dan ritme kehidupan manusia.',
+        'Setiap rangkaian karya foto merupakan buah perenungan dalam sunyi, meresapi cahaya, kontur bumi, dan ritme kehidupan manusia.',
       filterAll: 'Semua Karya',
       photosCount: 'Foto',
       exploreSeries: 'Jelajahi Seri',
@@ -434,7 +433,7 @@ const translations: Record<Language, Translations> = {
       badge: 'Kurikulum & Profil',
       title: 'Frans Delian',
       tagline: 'Cerita Melampaui Bingkai',
-      currentBase: 'Zurich, Swiss',
+      currentBase: 'Aceh, Indonesia',
       primaryMedium: 'Medium Format & Rangefinder',
       printArchival: 'Platinum-Palladium',
       inquireCommissions: 'Konsultasi Penugasan',
@@ -587,3 +586,4 @@ export function useLanguage() {
   }
   return context;
 }
+

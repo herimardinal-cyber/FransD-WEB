@@ -118,3 +118,4 @@ export default function LanguageSwitcher({ variant = 'nav', className = '' }: La
     </div>
   );
 }
+

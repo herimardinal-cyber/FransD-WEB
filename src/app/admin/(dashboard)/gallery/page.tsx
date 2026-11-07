@@ -90,13 +90,12 @@ export default async function AdminGalleryListPage() {
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
                     <span
-                      className={`text-[9px] font-mono uppercase px-2 py-0.5 font-semibold ${
-                        project.status === 'PUBLISHED'
-                          ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
-                          : project.status === 'DRAFT'
+                      className={`text-[9px] font-mono uppercase px-2 py-0.5 font-semibold ${project.status === 'PUBLISHED'
+                        ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'
+                        : project.status === 'DRAFT'
                           ? 'bg-amber-950/80 text-amber-300 border border-amber-700/60'
                           : 'bg-zinc-900/80 text-zinc-400 border border-zinc-700'
-                      }`}
+                        }`}
                     >
                       {project.status}
                     </span>
