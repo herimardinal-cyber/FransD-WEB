@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSessionAdmin, recordAuditLog } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -88,6 +89,14 @@ export async function POST(request: NextRequest) {
     });
 
     await recordAuditLog(admin.id, 'CREATE', 'Event', event.id, { title, slug });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/events');
+      revalidatePath(`/events/${slug}`);
+    } catch (e) {
+      console.warn('Revalidation error:', e);
+    }
 
     return NextResponse.json({ success: true, event });
   } catch (error: unknown) {

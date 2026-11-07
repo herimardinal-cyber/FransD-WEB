@@ -6,6 +6,10 @@ import { Metadata } from 'next';
 import { getDbStoryBySlug, getDbRelatedStories, getDbAllStories } from '@/lib/db-queries';
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+
 interface StoryDetailPageProps {
   params: Promise<{
     slug: string;

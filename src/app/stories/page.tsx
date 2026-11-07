@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 import { getDbAllStories } from '@/lib/db-queries';
 import StoriesPageClient from '@/components/stories/StoriesPageClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Stories & Visual Essays — Frans Delian Photography',
   description:

@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 import { getDbUpcomingEvents, getDbPastEvents } from '@/lib/db-queries';
 import EventsPageClient from '@/components/events/EventsPageClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Exhibitions & Events — Frans Delian Photography',
   description:

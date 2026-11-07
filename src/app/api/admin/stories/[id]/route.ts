@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSessionAdmin, recordAuditLog } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -112,6 +113,14 @@ export async function PUT(
 
     await recordAuditLog(admin.id, 'UPDATE', 'Story', id, { title, slug, status });
 
+    try {
+      revalidatePath('/');
+      revalidatePath('/stories');
+      if (updated.slug) revalidatePath(`/stories/${updated.slug}`);
+    } catch (e) {
+      console.warn('Revalidation error:', e);
+    }
+
     return NextResponse.json({ success: true, story: updated });
   } catch (error: unknown) {
     console.error('Update story failed:', error);
@@ -144,6 +153,14 @@ export async function DELETE(
 
     await prisma.story.delete({ where: { id } });
     await recordAuditLog(admin.id, 'DELETE', 'Story', id, { title: story.title });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/stories');
+      revalidatePath(`/stories/${story.slug}`);
+    } catch (e) {
+      console.warn('Revalidation error:', e);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

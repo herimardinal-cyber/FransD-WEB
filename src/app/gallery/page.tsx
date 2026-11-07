@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 import { getDbAllProjects } from '@/lib/db-queries';
 import GalleryPageClient from '@/components/gallery/GalleryPageClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Gallery Archive — Frans Delian Photography',
   description:

@@ -3,6 +3,9 @@ import { Metadata } from 'next';
 import { getDbFeaturedProjects, getDbAllStories, getDbLandingEvents } from '@/lib/db-queries';
 import HomePageClient from '@/components/home/HomePageClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'Frans Delian — Stories Beyond The Frame',
   description:

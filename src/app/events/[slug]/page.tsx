@@ -6,6 +6,10 @@ import { Metadata } from 'next';
 import { getDbEventBySlug, getDbAllEvents } from '@/lib/db-queries';
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Ticket, User } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+
 interface EventDetailPageProps {
   params: Promise<{
     slug: string;

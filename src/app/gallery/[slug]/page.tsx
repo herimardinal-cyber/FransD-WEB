@@ -7,6 +7,10 @@ import { getDbProjectBySlug, getDbRelatedProjects, getDbAllProjects } from '@/li
 import ProjectPhotoGrid from '@/components/gallery/ProjectPhotoGrid';
 import { ArrowLeft, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+
 interface GalleryDetailPageProps {
   params: Promise<{
     slug: string;

@@ -4,6 +4,9 @@ import AboutPageClient from '@/components/about/AboutPageClient';
 import prisma from '@/lib/prisma';
 import { profile as staticProfile } from '@/data';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: 'About Frans Delian — Stories Beyond The Frame',
   description:

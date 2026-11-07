@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSessionAdmin, recordAuditLog } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -84,6 +85,14 @@ export async function POST(request: NextRequest) {
     });
 
     await recordAuditLog(admin.id, 'CREATE', 'PhotoProject', project.id, { title, slug });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/gallery');
+      revalidatePath(`/gallery/${slug}`);
+    } catch (e) {
+      console.warn('Revalidation error:', e);
+    }
 
     return NextResponse.json({ success: true, project });
   } catch (error: unknown) {
