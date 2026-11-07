@@ -96,8 +96,11 @@ export interface PhotographerProfile {
   id: string;
   displayName: string;
   tagline: string;
+  taglineId?: string;
   biography: string[];
+  biographyId?: string[];
   philosophy: string[];
+  philosophyId?: string[];
   portraitImage: Photo;
   secondaryPortraitImage?: Photo;
   email: string;

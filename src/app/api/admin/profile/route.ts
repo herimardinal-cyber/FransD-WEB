@@ -25,10 +25,13 @@ export async function PUT(request: NextRequest) {
       displayName,
       name,
       tagline,
+      taglineId,
       biography,
       bio,
+      biographyId,
       philosophy,
       statement,
+      philosophyId,
       portraitImageUrl,
       portraitUrl,
       location,
@@ -39,8 +42,12 @@ export async function PUT(request: NextRequest) {
     const existing = await prisma.photographerProfile.findFirst();
 
     const finalName = displayName || name || 'Frans Delian';
+    const finalTagline = tagline || 'Stories Beyond The Frame';
+    const finalTaglineId = taglineId !== undefined ? taglineId : null;
     const finalBio = biography || bio || '';
+    const finalBioId = biographyId !== undefined ? biographyId : null;
     const finalPhilosophy = philosophy || statement || '';
+    const finalPhilosophyId = philosophyId !== undefined ? philosophyId : null;
     const finalPortrait = portraitImageUrl || portraitUrl || null;
 
     const updated = existing
@@ -48,9 +55,12 @@ export async function PUT(request: NextRequest) {
         where: { id: existing.id },
         data: {
           displayName: finalName,
-          tagline: tagline || 'Stories Beyond The Frame',
+          tagline: finalTagline,
+          taglineId: finalTaglineId,
           biography: finalBio,
+          biographyId: finalBioId,
           philosophy: finalPhilosophy,
+          philosophyId: finalPhilosophyId,
           portraitImageUrl: finalPortrait,
           location: location || 'Zurich, Switzerland',
           email: email || 'studio@fransdelian.com',
@@ -61,9 +71,12 @@ export async function PUT(request: NextRequest) {
         data: {
           id: 'default',
           displayName: finalName,
-          tagline: tagline || 'Stories Beyond The Frame',
+          tagline: finalTagline,
+          taglineId: finalTaglineId,
           biography: finalBio,
+          biographyId: finalBioId,
           philosophy: finalPhilosophy,
+          philosophyId: finalPhilosophyId,
           portraitImageUrl: finalPortrait,
           location: location || 'Zurich, Switzerland',
           email: email || 'studio@fransdelian.com',

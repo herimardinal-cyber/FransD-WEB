@@ -32,11 +32,11 @@ export default function AboutPageClient({ initialProfile }: AboutPageClientProps
   const rawPhil = profile.philosophy;
 
   const bioParas = language === 'id'
-    ? idBio
+    ? (profile.biographyId && profile.biographyId.length > 0 ? profile.biographyId : idBio)
     : (Array.isArray(rawBio) ? rawBio : [typeof rawBio === 'string' ? rawBio : '']);
 
   const philosophyParas = language === 'id'
-    ? idPhilosophy
+    ? (profile.philosophyId && profile.philosophyId.length > 0 ? profile.philosophyId : idPhilosophy)
     : (Array.isArray(rawPhil) ? rawPhil : [typeof rawPhil === 'string' ? rawPhil : '']);
 
   return (
@@ -86,7 +86,7 @@ export default function AboutPageClient({ initialProfile }: AboutPageClientProps
                 {profile.displayName}
               </h1>
               <p className="font-serif italic text-xl sm:text-2xl text-[#C6AA7B]">
-                &ldquo;{profile.tagline || t.about.tagline}&rdquo;
+                &ldquo;{language === 'id' ? (profile.taglineId || t.about.tagline) : (profile.tagline || t.about.tagline)}&rdquo;
               </p>
             </div>
 

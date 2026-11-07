@@ -8,14 +8,18 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  Globe,
 } from 'lucide-react';
 
 interface ProfileData {
   id?: string;
   displayName: string;
   tagline: string;
+  taglineId?: string | null;
   biography: string;
+  biographyId?: string | null;
   philosophy: string;
+  philosophyId?: string | null;
   portraitImageUrl?: string | null;
   location: string;
   email: string;
@@ -24,12 +28,28 @@ interface ProfileData {
 
 export default function ProfileForm({ initialData }: { initialData?: ProfileData | null }) {
   const router = useRouter();
+  const [activeLangTab, setActiveLangTab] = useState<'en' | 'id'>('en');
+
+  const defaultIdBio = `Frans Delian adalah fotografer seni murni dan dokumenter internasional yang berbasis di Zurich, Swiss. Karyanya telah dipamerkan di berbagai galeri terkemuka dan institusi seni di Eropa, Asia, dan Amerika Utara.
+
+Selama lebih dari lima belas tahun, Delian mendedikasikan hidupnya untuk mendokumentasikan sudut-sudut bumi yang paling sunyi — dataran tinggi Islandia yang dingin, labirin medina kuno di Afrika Utara, hingga kesunyian manusia di tengah gemerlap megapolitan Tokyo.
+
+Menggunakan format medium mekanis dan sistem rangefinder klasik, ia menolak kecepatan fotografi digital modern demi ketelitian dan apresiasi mendalam terhadap cahaya alami dan geometri chiaroscuro.`;
+
+  const defaultIdPhilosophy = `Cahaya bukanlah sekadar alat penerang; ia adalah entitas hidup yang bernafas dan mengubah wujud ruang.
+
+Komposisi yang jujur tidak lahir dari manipulasi, melainkan dari kesabaran menanti momen ketika realitas menyingkapkan dirinya sendiri tanpa rasa cemas.
+
+Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palladium untuk memastikan ketahanan arsip melampaui ratusan tahun.`;
 
   const [formData, setFormData] = useState({
     displayName: initialData?.displayName || 'Frans Delian',
     tagline: initialData?.tagline || 'Stories Beyond The Frame',
+    taglineId: initialData?.taglineId || 'Kisah Melampaui Bingkai Lensa',
     biography: initialData?.biography || '',
+    biographyId: initialData?.biographyId || defaultIdBio,
     philosophy: initialData?.philosophy || '',
+    philosophyId: initialData?.philosophyId || defaultIdPhilosophy,
     portraitImageUrl: initialData?.portraitImageUrl || '',
     location: initialData?.location || 'Zurich, Switzerland',
     email: initialData?.email || 'studio@fransdelian.com',
@@ -89,7 +109,7 @@ export default function ProfileForm({ initialData }: { initialData?: ProfileData
         throw new Error(data.error || 'Failed to update profile.');
       }
 
-      setMessage({ type: 'success', text: 'Photographer profile updated successfully.' });
+      setMessage({ type: 'success', text: 'Photographer profile updated successfully for both English & Indonesian!' });
       router.refresh();
     } catch (err) {
       setMessage({
@@ -126,10 +146,11 @@ export default function ProfileForm({ initialData }: { initialData?: ProfileData
 
       {message && (
         <div
-          className={`p-4 border text-xs flex items-center gap-3 ${message.type === 'success'
-            ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
-            : 'bg-red-950/40 border-red-800/60 text-red-300'
-            }`}
+          className={`p-4 border text-xs flex items-center gap-3 ${
+            message.type === 'success'
+              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
+              : 'bg-red-950/40 border-red-800/60 text-red-300'
+          }`}
         >
           {message.type === 'success' ? (
             <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -140,64 +161,160 @@ export default function ProfileForm({ initialData }: { initialData?: ProfileData
         </div>
       )}
 
+      {/* Language Version Selector Tab */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-[#121212] border border-[#222]">
+        <div className="flex items-center gap-2">
+          <Globe className="w-4 h-4 text-[#C6AA7B]" />
+          <span className="text-xs font-mono uppercase tracking-wider text-[#A7A7A7] mr-2">
+            Pilihan Bahasa Konten:
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveLangTab('en')}
+            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${
+              activeLangTab === 'en'
+                ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
+                : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
+            }`}
+          >
+            English (EN)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveLangTab('id')}
+            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${
+              activeLangTab === 'id'
+                ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
+                : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
+            }`}
+          >
+            Bahasa Indonesia (ID)
+          </button>
+        </div>
+        <span className="text-[11px] font-mono text-[#C6AA7B]">
+          {activeLangTab === 'en' ? '• Currently Editing English Version' : '• Sedang Mengedit Versi Bahasa Indonesia'}
+        </span>
+      </div>
+
       {/* Profile Form */}
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-[#121212] border border-[#222] p-6 space-y-5">
-            <h3 className="font-serif text-xl text-[#F2EFE9] border-b border-[#1C1C1C] pb-3">
-              Biographical & Philosophical Manifesto
+            <h3 className="font-serif text-xl text-[#F2EFE9] border-b border-[#1C1C1C] pb-3 flex items-center justify-between">
+              <span>Biographical & Philosophical Manifesto</span>
+              <span className="text-xs font-mono text-[#C6AA7B] uppercase tracking-widest">
+                [{activeLangTab.toUpperCase()}]
+              </span>
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                  Photographer Name <span className="text-[#C6AA7B]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.displayName}
-                  onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                  Studio Tagline
-                </label>
-                <input
-                  type="text"
-                  value={formData.tagline}
-                  onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none italic font-serif"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Curatorial Biography
+                Photographer Name <span className="text-[#C6AA7B]">*</span>
               </label>
-              <textarea
-                rows={6}
-                value={formData.biography}
-                onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
-                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed"
+              <input
+                type="text"
+                required
+                value={formData.displayName}
+                onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none"
               />
             </div>
 
-            <div>
-              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Artist Philosophy & Approach
-              </label>
-              <textarea
-                rows={6}
-                value={formData.philosophy}
-                onChange={(e) => setFormData({ ...formData, philosophy: e.target.value })}
-                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed"
-              />
-            </div>
+            {activeLangTab === 'en' ? (
+              <>
+                {/* English Tagline */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Studio Tagline (English)</span>
+                    <span className="text-[#C6AA7B] font-mono">[EN]</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.tagline}
+                    onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none italic font-serif"
+                    placeholder="Stories Beyond The Frame"
+                  />
+                </div>
+
+                {/* English Biography */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Curatorial Biography (English)</span>
+                    <span className="text-[#C6AA7B] font-mono">[EN]</span>
+                  </label>
+                  <textarea
+                    rows={7}
+                    value={formData.biography}
+                    onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-sans"
+                    placeholder="Enter biography in English..."
+                  />
+                </div>
+
+                {/* English Philosophy */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Artist Philosophy & Approach (English)</span>
+                    <span className="text-[#C6AA7B] font-mono">[EN]</span>
+                  </label>
+                  <textarea
+                    rows={7}
+                    value={formData.philosophy}
+                    onChange={(e) => setFormData({ ...formData, philosophy: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-sans"
+                    placeholder="Enter artistic philosophy in English..."
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Indonesian Tagline */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Tagline Studio (Bahasa Indonesia)</span>
+                    <span className="text-[#C6AA7B] font-mono">[ID]</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.taglineId}
+                    onChange={(e) => setFormData({ ...formData, taglineId: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none italic font-serif"
+                    placeholder="Kisah Melampaui Bingkai Lensa"
+                  />
+                </div>
+
+                {/* Indonesian Biography */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Biografi Kuratorial (Bahasa Indonesia)</span>
+                    <span className="text-[#C6AA7B] font-mono">[ID]</span>
+                  </label>
+                  <textarea
+                    rows={7}
+                    value={formData.biographyId}
+                    onChange={(e) => setFormData({ ...formData, biographyId: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-sans"
+                    placeholder="Tulis biografi dalam Bahasa Indonesia..."
+                  />
+                </div>
+
+                {/* Indonesian Philosophy */}
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Filosofi & Pendekatan Seni (Bahasa Indonesia)</span>
+                    <span className="text-[#C6AA7B] font-mono">[ID]</span>
+                  </label>
+                  <textarea
+                    rows={7}
+                    value={formData.philosophyId}
+                    onChange={(e) => setFormData({ ...formData, philosophyId: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-sans"
+                    placeholder="Tulis filosofi pendekatan fotografi dalam Bahasa Indonesia..."
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 

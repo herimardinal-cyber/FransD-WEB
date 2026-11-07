@@ -143,8 +143,11 @@ model PhotographerProfile {
   id                   String   @id @default("default")
   displayName          String   @default("Frans Delian")
   tagline              String   @default("Stories Beyond The Frame")
+  taglineId            String?  @db.VarChar(500)
   biography            String   @db.LongText
+  biographyId          String?  @db.LongText
   philosophy           String   @db.LongText
+  philosophyId         String?  @db.LongText
   portraitImageUrl     String?  @db.VarChar(1000)
   secondaryPortraitUrl String?  @db.VarChar(1000)
   email                String   @default("studio@fransdelian.com")
