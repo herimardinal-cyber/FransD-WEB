@@ -3,12 +3,18 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { profile } from '@/data';
+import { profile as staticProfile } from '@/data';
+import { PhotographerProfile } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { ArrowRight, Award, MapPin } from 'lucide-react';
 
-export default function AboutPageClient() {
+interface AboutPageClientProps {
+  initialProfile?: PhotographerProfile;
+}
+
+export default function AboutPageClient({ initialProfile }: AboutPageClientProps) {
   const { t, language } = useLanguage();
+  const profile = initialProfile || staticProfile;
 
   const idBio = [
     'Frans Delian adalah fotografer seni murni dan dokumenter internasional yang berbasis di Zurich, Swiss. Karyanya telah dipamerkan di berbagai galeri terkemuka dan institusi seni di Eropa, Asia, dan Amerika Utara.',
@@ -22,8 +28,16 @@ export default function AboutPageClient() {
     'Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palladium untuk memastikan ketahanan arsip melampaui ratusan tahun.',
   ];
 
-  const bioParas = language === 'id' ? idBio : profile.biography;
-  const philosophyParas = language === 'id' ? idPhilosophy : profile.philosophy;
+  const rawBio = profile.biography;
+  const rawPhil = profile.philosophy;
+
+  const bioParas = language === 'id'
+    ? idBio
+    : (Array.isArray(rawBio) ? rawBio : [typeof rawBio === 'string' ? rawBio : '']);
+
+  const philosophyParas = language === 'id'
+    ? idPhilosophy
+    : (Array.isArray(rawPhil) ? rawPhil : [typeof rawPhil === 'string' ? rawPhil : '']);
 
   return (
     <div className="pt-32 pb-24 sm:pb-32 bg-[#080808] min-h-screen text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
@@ -36,8 +50,8 @@ export default function AboutPageClient() {
           <div className="lg:col-span-5 relative">
             <div className="relative aspect-[4/5] w-full max-w-md mx-auto overflow-hidden bg-[#171717] border border-[#262626] shadow-2xl">
               <Image
-                src={profile.portraitImage.url}
-                alt={profile.portraitImage.altText}
+                src={profile.portraitImage?.url || staticProfile.portraitImage.url}
+                alt={profile.portraitImage?.altText || profile.displayName}
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 40vw"
@@ -49,7 +63,7 @@ export default function AboutPageClient() {
             <div className="mt-6 p-6 bg-[#121212] border border-[#262626] text-xs font-mono space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#717171]">{language === 'id' ? 'Basis Studio:' : 'Current Base:'}</span>
-                <span className="text-[#F2EFE9]">{t.about.currentBase}</span>
+                <span className="text-[#F2EFE9]">{profile.location || t.about.currentBase}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#717171]">{language === 'id' ? 'Medium Utama:' : 'Primary Medium:'}</span>
@@ -72,7 +86,7 @@ export default function AboutPageClient() {
                 {profile.displayName}
               </h1>
               <p className="font-serif italic text-xl sm:text-2xl text-[#C6AA7B]">
-                &ldquo;{t.about.tagline}&rdquo;
+                &ldquo;{profile.tagline || t.about.tagline}&rdquo;
               </p>
             </div>
 
@@ -91,7 +105,7 @@ export default function AboutPageClient() {
               </Link>
               <Link
                 href="/gallery"
-                className="px-8 py-3.5 bg-[#171717] hover:bg-[#262626] text-[#F2EFE9] border border-[#262626] uppercase tracking-[0.2em] transition-all"
+                className="px-8 py-3.5 border border-[#262626] hover:border-[#C6AA7B] text-[#F2EFE9] uppercase tracking-[0.2em] transition-all"
               >
                 {t.about.viewWorks}
               </Link>
@@ -100,29 +114,39 @@ export default function AboutPageClient() {
         </section>
 
         {/* ========================================================= */}
-        {/* 2. PHILOSOPHY & FIELD REFLECTION */}
+        {/* 2. ARTISTIC PHILOSOPHY */}
         {/* ========================================================= */}
         <section className="py-24 border-b border-[#1d1d1d]">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#C6AA7B]">
+          <div className="max-w-3xl mb-16">
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#C6AA7B] block mb-2">
               {t.about.philosophyBadge}
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl text-[#F2EFE9] leading-snug">
-              {t.about.philosophyQuote}
-            </h2>
-            <div className="text-sm sm:text-base text-[#A7A7A7] leading-relaxed space-y-4 max-w-2xl mx-auto text-left">
-              {philosophyParas.map((ph, idx) => (
-                <p key={idx}>{ph}</p>
-              ))}
-            </div>
+            <blockquote className="font-serif italic text-2xl sm:text-3xl text-[#F2EFE9] leading-snug">
+              &ldquo;{t.about.philosophyQuote}&rdquo;
+            </blockquote>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {philosophyParas.map((phil, idx) => (
+              <div
+                key={idx}
+                className="p-8 bg-[#121212] border border-[#262626] hover:border-[#C6AA7B]/40 transition-colors flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  <span className="text-xs font-mono text-[#C6AA7B]">0{idx + 1}</span>
+                  <p className="text-sm text-[#A7A7A7] leading-relaxed font-sans">{phil}</p>
+                </div>
+                <div className="w-8 h-[1px] bg-[#C6AA7B]/40 mt-8" />
+              </div>
+            ))}
           </div>
         </section>
 
         {/* ========================================================= */}
-        {/* 3. AWARDS, EXHIBITIONS & GEAR */}
+        {/* 3. HONORS, AWARDS & SELECTED EXHIBITIONS */}
         {/* ========================================================= */}
         <section className="py-24 border-b border-[#1d1d1d]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             {/* Honors & Awards */}
             <div>
               <div className="flex items-center gap-2 mb-8 pb-3 border-b border-[#262626]">
@@ -130,7 +154,7 @@ export default function AboutPageClient() {
                 <h3 className="font-serif text-3xl text-[#F2EFE9]">{t.about.honorsTitle}</h3>
               </div>
               <div className="space-y-6">
-                {profile.awards.map((award, idx) => (
+                {(profile.awards || staticProfile.awards).map((award, idx) => (
                   <div key={idx} className="flex items-start justify-between gap-4 pb-4 border-b border-[#1d1d1d]">
                     <div>
                       <h4 className="text-sm sm:text-base font-serif text-[#F2EFE9]">{award.title}</h4>
@@ -153,7 +177,7 @@ export default function AboutPageClient() {
                 </h3>
               </div>
               <div className="space-y-6">
-                {profile.exhibitions.map((ex, idx) => (
+                {(profile.exhibitions || staticProfile.exhibitions).map((ex, idx) => (
                   <div key={idx} className="flex items-start justify-between gap-4 pb-4 border-b border-[#1d1d1d]">
                     <div>
                       <h4 className="text-sm sm:text-base font-serif text-[#F2EFE9]">{ex.title}</h4>
@@ -186,7 +210,7 @@ export default function AboutPageClient() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {profile.gear.map((g, idx) => (
+            {(profile.gear || staticProfile.gear).map((g, idx) => (
               <div key={idx} className="bg-[#121212] border border-[#262626] p-6 space-y-4">
                 <span className="text-xs font-mono uppercase tracking-widest text-[#C6AA7B] block pb-2 border-b border-[#262626]">
                   {g.category}
@@ -231,4 +255,3 @@ export default function AboutPageClient() {
     </div>
   );
 }
-

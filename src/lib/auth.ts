@@ -33,9 +33,10 @@ export async function createAdminSession(adminUserId: string): Promise<string> {
   });
 
   const cookieStore = await cookies();
+  const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https');
   cookieStore.set(SESSION_COOKIE_NAME, rawToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production' && !!isHttps,
     sameSite: 'lax',
     path: '/',
     expires: expiresAt,
