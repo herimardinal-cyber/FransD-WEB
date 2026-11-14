@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
       featured,
       isFeatured,
       status,
+      coverImage,
     } = data;
 
     if (!title || !slug || !category || !year) {
@@ -69,6 +70,20 @@ export async function POST(request: NextRequest) {
     });
     const sortOrder = (highestSort._max.sortOrder ?? 0) + 1;
 
+    let coverImageId: string | null = null;
+    if (coverImage) {
+      const photo = await prisma.photo.create({
+        data: {
+          url: coverImage,
+          altText: (title || '').slice(0, 500),
+          width: 1920,
+          height: 1080,
+          aspectRatio: 'landscape',
+        },
+      });
+      coverImageId = photo.id;
+    }
+
     const project = await prisma.photoProject.create({
       data: {
         title,
@@ -81,8 +96,16 @@ export async function POST(request: NextRequest) {
         featured: Boolean(featured ?? isFeatured),
         status: status || 'DRAFT',
         sortOrder,
+        coverImageId,
       },
     });
+
+    if (coverImageId) {
+      await prisma.photo.update({
+        where: { id: coverImageId },
+        data: { projectId: project.id },
+      });
+    }
 
     await recordAuditLog(admin.id, 'CREATE', 'PhotoProject', project.id, { title, slug });
 

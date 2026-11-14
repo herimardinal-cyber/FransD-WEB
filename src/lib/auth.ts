@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import prisma from './prisma';
 
 const SESSION_COOKIE_NAME = 'fd_admin_session';
-const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 // Helper to hash token before saving to database
 function hashToken(token: string): string {
@@ -82,6 +82,16 @@ export async function getSessionAdmin() {
 
   if (!session.adminUser || !session.adminUser.isActive) {
     return null;
+  }
+
+  // Sliding session extension: if less than 15 days remaining, extend by 30 days
+  const fifteenDaysFromNow = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
+  if (session.expiresAt < fifteenDaysFromNow) {
+    const newExpires = new Date(Date.now() + SESSION_DURATION_MS);
+    prisma.adminSession.update({
+      where: { id: session.id },
+      data: { expiresAt: newExpires },
+    }).catch(() => {});
   }
 
   return session.adminUser;

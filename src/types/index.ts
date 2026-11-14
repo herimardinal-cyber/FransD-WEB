@@ -25,7 +25,8 @@ export type ProjectCategory =
   | 'Portrait'
   | 'Documentary'
   | 'Street'
-  | 'Editorial';
+  | 'Editorial'
+  | (string & {});
 
 export interface PhotoProject {
   id: string;

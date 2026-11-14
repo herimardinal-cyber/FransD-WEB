@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Camera,
+  Star,
 } from 'lucide-react';
 
 interface PhotoItem {
@@ -47,22 +48,47 @@ interface ProjectData {
   photos?: PhotoItem[];
 }
 
-const CATEGORIES = [
+interface ProjectFormProps {
+  initialData?: ProjectData;
+  existingCategories?: string[];
+}
+
+const DEFAULT_CATEGORIES = [
+  'Landscape',
+  'Portrait',
+  'Street',
+  'Documentary',
+  'Editorial',
   'Architectural & Urban',
-  'Landscape & Silence',
-  'Intimate Portraits',
-  'Documentary Series',
   'Fine Art Edition',
+  'Prewedding',
+  'Wedding',
+  'Commercial',
 ];
 
-export default function ProjectForm({ initialData }: { initialData?: ProjectData }) {
+export default function ProjectForm({ initialData, existingCategories }: ProjectFormProps) {
   const router = useRouter();
   const isEditing = Boolean(initialData?.id);
+
+  // Initialize dynamic categories list
+  const [categories, setCategories] = useState<string[]>(() => {
+    const merged = Array.from(
+      new Set([
+        ...DEFAULT_CATEGORIES,
+        ...(existingCategories || []),
+        ...(initialData?.category ? [initialData.category] : []),
+      ])
+    );
+    return merged;
+  });
+
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   const [formData, setFormData] = useState<ProjectData>({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
-    category: initialData?.category || CATEGORIES[0],
+    category: initialData?.category || categories[0] || 'Landscape',
     year: initialData?.year || new Date().getFullYear(),
     location: initialData?.location || '',
     client: initialData?.client || '',
@@ -74,7 +100,9 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
 
   const [photos, setPhotos] = useState<PhotoItem[]>(initialData?.photos || []);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Auto-generate slug from title if slug not manually customized
@@ -91,10 +119,65 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
     }
   };
 
+  // Add custom category
+  const handleAddNewCategory = () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) return;
+    if (!categories.some((c) => c.toLowerCase() === trimmed.toLowerCase())) {
+      setCategories((prev) => [...prev, trimmed]);
+    }
+    const targetCategory = categories.find((c) => c.toLowerCase() === trimmed.toLowerCase()) || trimmed;
+    setFormData((prev) => ({ ...prev, category: targetCategory }));
+    setIsAddingCategory(false);
+    setNewCategoryName('');
+  };
+
+  // Cover Image File Upload Handler
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setIsUploadingCover(true);
+    setMessage(null);
+    setIsSessionExpired(false);
+
+    try {
+      const uploadBody = new FormData();
+      uploadBody.append('file', file);
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: uploadBody,
+      });
+
+      const data = await res.json();
+      if (res.status === 401 || data.error === 'Unauthorized') {
+        setIsSessionExpired(true);
+        throw new Error('Sesi login telah berakhir (Unauthorized). Silakan login kembali di tab baru agar data tidak hilang.');
+      }
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to upload cover image.');
+      }
+
+      setFormData((prev) => ({ ...prev, coverImage: data.file.url }));
+      setMessage({ type: 'success', text: 'Cover image uploaded successfully.' });
+    } catch (err: unknown) {
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Cover upload failed.',
+      });
+    } finally {
+      setIsUploadingCover(false);
+      e.target.value = '';
+    }
+  };
+
+  // Save Project Handler
   const handleSaveProject = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     setMessage(null);
+    setIsSessionExpired(false);
 
     try {
       const endpoint = isEditing
@@ -109,11 +192,16 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
       });
 
       const data = await res.json();
+      if (res.status === 401 || data.error === 'Unauthorized') {
+        setIsSessionExpired(true);
+        throw new Error('Sesi login telah berakhir (Unauthorized). Silakan buka tab baru untuk login kembali agar inputan Anda tidak hilang, lalu klik "Save Series" lagi.');
+      }
+
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to save project.');
       }
 
-      setMessage({ type: 'success', text: 'Project saved successfully.' });
+      setMessage({ type: 'success', text: 'Project series saved successfully.' });
 
       if (!isEditing && data.project?.id) {
         router.push(`/admin/gallery/${data.project.id}`);
@@ -130,12 +218,13 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
     }
   };
 
-  // Photo Upload Handler
+  // Photo Upload Handler (for attached project stills)
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!initialData?.id || !e.target.files || e.target.files.length === 0) return;
 
-    setIsUploading(true);
+    setIsUploadingPhotos(true);
     setMessage(null);
+    setIsSessionExpired(false);
 
     try {
       const files = Array.from(e.target.files);
@@ -151,6 +240,11 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
         });
 
         const uploadData = await uploadRes.json();
+        if (uploadRes.status === 401 || uploadData.error === 'Unauthorized') {
+          setIsSessionExpired(true);
+          throw new Error('Sesi login telah berakhir (Unauthorized). Silakan login kembali.');
+        }
+
         if (!uploadRes.ok || !uploadData.success) {
           throw new Error(uploadData.error || `Failed to upload ${file.name}`);
         }
@@ -169,6 +263,10 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
         const photoData = await photoRes.json();
         if (photoRes.ok && photoData.photo) {
           setPhotos((prev) => [...prev, photoData.photo]);
+          // If no cover image exists yet, automatically set first uploaded photo as cover
+          if (!formData.coverImage) {
+            setFormData((prev) => ({ ...prev, coverImage: photoData.photo.url }));
+          }
         }
       }
 
@@ -180,8 +278,7 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
         text: err instanceof Error ? err.message : 'Photo upload failed.',
       });
     } finally {
-      setIsUploading(false);
-      // Reset input
+      setIsUploadingPhotos(false);
       e.target.value = '';
     }
   };
@@ -260,21 +357,34 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
         </button>
       </div>
 
-      {/* Status Messages */}
+      {/* Status Messages & 401 Session Notice */}
       {message && (
         <div
-          className={`p-4 border text-xs flex items-center gap-3 ${
+          className={`p-4 border text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
             message.type === 'success'
               ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
               : 'bg-red-950/40 border-red-800/60 text-red-300'
           }`}
         >
-          {message.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-          ) : (
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="flex items-center gap-3">
+            {message.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span>{message.text}</span>
+          </div>
+
+          {isSessionExpired && (
+            <a
+              href="/admin/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 bg-[#C6AA7B] text-[#080808] font-mono text-[11px] font-semibold uppercase tracking-wider hover:bg-[#D8BD8F] whitespace-nowrap transition-colors"
+            >
+              Buka Halaman Login (Tab Baru) &rarr;
+            </a>
           )}
-          <span>{message.text}</span>
         </div>
       )}
 
@@ -324,21 +434,86 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
 
             {/* Category & Year */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* Category with Add Feature */}
               <div>
-                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                  Category <span className="text-[#C6AA7B]">*</span>
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
+                    Category <span className="text-[#C6AA7B]">*</span>
+                  </label>
+                  {!isAddingCategory && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingCategory(true)}
+                      className="text-[11px] font-mono text-[#C6AA7B] hover:text-[#D8BD8F] transition-colors"
+                    >
+                      + Tambah Kategori
+                    </button>
+                  )}
+                </div>
+
+                {isAddingCategory ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddNewCategory();
+                          }
+                        }}
+                        placeholder="Ketik kategori baru (misal: Prewedding)"
+                        className="flex-1 bg-[#171717] border border-[#C6AA7B] text-[#F2EFE9] px-3 py-2.5 text-sm focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddNewCategory}
+                        className="px-3 py-2 bg-[#C6AA7B] text-[#080808] font-mono text-xs uppercase tracking-wider font-semibold hover:bg-[#D8BD8F]"
+                      >
+                        Pakai
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingCategory(false);
+                          setNewCategoryName('');
+                        }}
+                        className="px-2.5 py-2 bg-[#222] text-[#A7A7A7] hover:text-[#F2EFE9] text-xs font-mono"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-[#717171] font-mono block">
+                      Tekan &quot;Pakai&quot; atau Enter untuk menetapkan kategori ini.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={formData.category}
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW__') {
+                          setIsAddingCategory(true);
+                        } else {
+                          setFormData({ ...formData, category: e.target.value });
+                        }
+                      }}
+                      className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-4 py-3 text-sm focus:outline-none"
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__NEW__" className="text-[#C6AA7B] font-semibold">
+                        + Tambah Kategori Baru...
+                      </option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -446,20 +621,88 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
               />
             </div>
 
-            {/* Cover Image URL */}
-            <div className="pt-2 border-t border-[#1C1C1C]">
-              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Cover Image URL (Optional)
+            {/* Cover Image Upload (No URL Textbox) */}
+            <div className="pt-2 border-t border-[#1C1C1C] space-y-3">
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
+                Cover Image
               </label>
-              <input
-                type="text"
-                value={formData.coverImage || ''}
-                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                placeholder="https://... or /uploads/..."
-                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
-              />
-              <span className="text-[10px] text-[#717171] mt-1 block">
-                If left empty, the first photo in the series serves as the cover.
+
+              {formData.coverImage ? (
+                <div className="space-y-3">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#181818] border border-[#2A2A2A] group">
+                    <Image
+                      src={formData.coverImage}
+                      alt="Cover Preview"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <label className="px-3 py-1.5 bg-[#C6AA7B] hover:bg-[#D8BD8F] text-[#080808] text-xs font-mono uppercase cursor-pointer font-semibold transition-colors flex items-center gap-1.5">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Ganti Cover</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          disabled={isUploadingCover}
+                          onChange={handleCoverUpload}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, coverImage: '' }))}
+                        className="p-2 bg-red-600/90 hover:bg-red-600 text-white transition-colors"
+                        title="Hapus Cover"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-[#A7A7A7] font-mono truncate max-w-[180px]">
+                      {formData.coverImage.split('/').pop()}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, coverImage: '' }))}
+                      className="text-[11px] text-red-400 hover:text-red-300 font-mono transition-colors"
+                    >
+                      Hapus Cover
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border border-dashed border-[#2E2E2E] hover:border-[#C6AA7B]/60 p-6 text-center bg-[#151515]/60 transition-colors">
+                  <label className="cursor-pointer block">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      disabled={isUploadingCover}
+                      onChange={handleCoverUpload}
+                    />
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-[#1F1F1F] border border-[#2E2E2E] flex items-center justify-center text-[#C6AA7B]">
+                        {isUploadingCover ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Upload className="w-5 h-5" />
+                        )}
+                      </div>
+                      <span className="text-xs font-mono text-[#F2EFE9] uppercase tracking-wider block">
+                        {isUploadingCover ? 'Mengupload Cover...' : 'Upload Cover Image'}
+                      </span>
+                      <span className="text-[11px] text-[#717171] block">
+                        JPG, PNG, WebP (Maks 10MB)
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              )}
+
+              <span className="text-[11px] text-[#717171] block">
+                Foto sampul utama yang ditampilkan di grid galeri dan hero header.
               </span>
             </div>
           </div>
@@ -481,7 +724,7 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
 
             {/* Upload Button */}
             <label className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1F1E1B] hover:bg-[#C6AA7B] text-[#C6AA7B] hover:text-[#080808] border border-[#C6AA7B]/40 font-mono text-xs uppercase tracking-wider font-semibold cursor-pointer transition-colors">
-              {isUploading ? (
+              {isUploadingPhotos ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Uploading Files...</span>
@@ -497,7 +740,7 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
                 multiple
                 accept="image/jpeg,image/png,image/webp"
                 className="hidden"
-                disabled={isUploading}
+                disabled={isUploadingPhotos}
                 onChange={handlePhotoUpload}
               />
             </label>
@@ -514,68 +757,94 @@ export default function ProjectForm({ initialData }: { initialData?: ProjectData
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {photos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  className="bg-[#161616] border border-[#262626] overflow-hidden flex flex-col justify-between group"
-                >
-                  <div className="relative aspect-[4/3] bg-[#0A0A0A] overflow-hidden">
-                    <Image
-                      src={photo.url}
-                      alt={photo.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
+              {photos.map((photo, index) => {
+                const isCurrentCover = formData.coverImage === photo.url;
 
-                    {/* Order Badge */}
-                    <div className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 text-[10px] font-mono text-[#C6AA7B]">
-                      #{index + 1}
+                return (
+                  <div
+                    key={photo.id}
+                    className="bg-[#161616] border border-[#262626] overflow-hidden flex flex-col justify-between group"
+                  >
+                    <div className="relative aspect-[4/3] bg-[#0A0A0A] overflow-hidden">
+                      <Image
+                        src={photo.url}
+                        alt={photo.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+
+                      {/* Order Badge */}
+                      <div className="absolute top-2 left-2 bg-black/80 px-2 py-0.5 text-[10px] font-mono text-[#C6AA7B]">
+                        #{index + 1}
+                      </div>
+
+                      {/* Cover Badge or Set as Cover Button */}
+                      {isCurrentCover ? (
+                        <div className="absolute bottom-2 left-2 bg-[#C6AA7B] text-[#080808] px-2.5 py-1 text-[10px] font-mono uppercase font-bold flex items-center gap-1 shadow-md">
+                          <Star className="w-3 h-3 fill-current" />
+                          <span>Cover Image</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => ({ ...prev, coverImage: photo.url }));
+                            setMessage({
+                              type: 'success',
+                              text: `Foto #${index + 1} dipilih sebagai sampul (Cover Image). Klik Save Series untuk menyimpan.`,
+                            });
+                          }}
+                          className="absolute bottom-2 left-2 bg-black/85 hover:bg-[#C6AA7B] text-[#C6AA7B] hover:text-[#080808] px-2.5 py-1 text-[10px] font-mono uppercase font-semibold opacity-0 group-hover:opacity-100 transition-all border border-[#C6AA7B]/40"
+                        >
+                          Set as Cover
+                        </button>
+                      )}
+
+                      {/* Quick Move Buttons */}
+                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleMovePhoto(index, 'up')}
+                          disabled={index === 0}
+                          title="Move Up"
+                          className="p-1 hover:text-[#C6AA7B] text-[#A7A7A7] disabled:opacity-20"
+                        >
+                          <MoveUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleMovePhoto(index, 'down')}
+                          disabled={index === photos.length - 1}
+                          title="Move Down"
+                          className="p-1 hover:text-[#C6AA7B] text-[#A7A7A7] disabled:opacity-20"
+                        >
+                          <MoveDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Quick Move Buttons */}
-                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Metadata preview & delete */}
+                    <div className="p-3.5 flex items-center justify-between text-xs border-t border-[#222]">
+                      <div className="min-w-0 pr-2">
+                        <div className="font-serif text-sm text-[#F2EFE9] truncate">
+                          {photo.title}
+                        </div>
+                        <div className="text-[10px] font-mono text-[#717171] truncate">
+                          {photo.camera || 'Leica M11'} {photo.lens ? `• ${photo.lens}` : ''}
+                        </div>
+                      </div>
+
                       <button
-                        onClick={() => handleMovePhoto(index, 'up')}
-                        disabled={index === 0}
-                        title="Move Up"
-                        className="p-1 hover:text-[#C6AA7B] text-[#A7A7A7] disabled:opacity-20"
+                        type="button"
+                        onClick={() => handleDeletePhoto(photo.id)}
+                        title="Delete photo"
+                        className="text-zinc-500 hover:text-red-400 p-1 transition-colors"
                       >
-                        <MoveUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleMovePhoto(index, 'down')}
-                        disabled={index === photos.length - 1}
-                        title="Move Down"
-                        className="p-1 hover:text-[#C6AA7B] text-[#A7A7A7] disabled:opacity-20"
-                      >
-                        <MoveDown className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-
-                  {/* Metadata preview & delete */}
-                  <div className="p-3.5 flex items-center justify-between text-xs border-t border-[#222]">
-                    <div className="min-w-0 pr-2">
-                      <div className="font-serif text-sm text-[#F2EFE9] truncate">
-                        {photo.title}
-                      </div>
-                      <div className="text-[10px] font-mono text-[#717171] truncate">
-                        {photo.camera || 'Leica M11'} {photo.lens ? `• ${photo.lens}` : ''}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeletePhoto(photo.id)}
-                      title="Delete photo"
-                      className="text-zinc-500 hover:text-red-400 p-1 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

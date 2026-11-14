@@ -11,18 +11,22 @@ interface GalleryGridProps {
   initialProjects: PhotoProject[];
 }
 
-const CATEGORIES: ProjectCategory[] = [
-  'All',
-  'Landscape',
-  'Portrait',
-  'Street',
-  'Documentary',
-  'Editorial',
-];
-
 export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
   const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
+
+  const categories: ProjectCategory[] = useMemo(() => {
+    const defaultOrder = ['All', 'Landscape', 'Portrait', 'Street', 'Documentary', 'Editorial'];
+    const projectCategories = Array.from(
+      new Set(initialProjects.map((p) => p.category).filter(Boolean))
+    );
+    const combined = Array.from(new Set(['All', ...defaultOrder, ...projectCategories]));
+    return combined.filter(
+      (cat) =>
+        cat === 'All' ||
+        initialProjects.some((p) => p.category.toLowerCase() === cat.toLowerCase())
+    );
+  }, [initialProjects]);
 
   const filteredProjects = useMemo(() => {
     if (activeCategory === 'All') return initialProjects;
@@ -35,7 +39,7 @@ export default function GalleryGrid({ initialProjects }: GalleryGridProps) {
     <div className="w-full">
       {/* Category Filter Pills */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12 sm:mb-16">
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isSelected = activeCategory === cat;
           const count =
             cat === 'All'

@@ -56,6 +56,7 @@ export async function PUT(
       isFeatured,
       status,
       sortOrder,
+      coverImage,
     } = data;
 
     if (slug) {
@@ -70,6 +71,32 @@ export async function PUT(
           { success: false, error: 'Slug is already used by another project.' },
           { status: 400 }
         );
+      }
+    }
+
+    let coverImageIdToSet: string | null | undefined = undefined;
+    if (coverImage !== undefined) {
+      if (coverImage) {
+        const existingPhoto = await prisma.photo.findFirst({
+          where: { projectId: id, url: coverImage },
+        });
+        if (existingPhoto) {
+          coverImageIdToSet = existingPhoto.id;
+        } else {
+          const newPhoto = await prisma.photo.create({
+            data: {
+              projectId: id,
+              url: coverImage,
+              altText: (title || 'Project Cover').slice(0, 500),
+              width: 1920,
+              height: 1080,
+              aspectRatio: 'landscape',
+            },
+          });
+          coverImageIdToSet = newPhoto.id;
+        }
+      } else {
+        coverImageIdToSet = null;
       }
     }
 
@@ -88,6 +115,7 @@ export async function PUT(
         }),
         ...(status !== undefined && { status }),
         ...(sortOrder !== undefined && { sortOrder: Number(sortOrder) }),
+        ...(coverImageIdToSet !== undefined && { coverImageId: coverImageIdToSet }),
       },
     });
 
