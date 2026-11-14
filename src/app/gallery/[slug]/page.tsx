@@ -147,10 +147,6 @@ export default async function GalleryDetailPage({ params }: GalleryDetailPagePro
                   <span className="text-[#717171] uppercase tracking-wider block mb-1">Period</span>
                   <span className="text-[#F2EFE9]">Expedition Year {project.year}</span>
                 </div>
-                <div>
-                  <span className="text-[#717171] uppercase tracking-wider block mb-1">Medium & Format</span>
-                  <span className="text-[#F2EFE9]">Medium Format / Monochrome Platinum</span>
-                </div>
                 {project.client && (
                   <div>
                     <span className="text-[#717171] uppercase tracking-wider block mb-1">Commission</span>
