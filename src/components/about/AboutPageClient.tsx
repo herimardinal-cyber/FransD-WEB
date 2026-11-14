@@ -59,21 +59,6 @@ export default function AboutPageClient({ initialProfile }: AboutPageClientProps
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
-
-            <div className="mt-6 p-6 bg-[#121212] border border-[#262626] text-xs font-mono space-y-2">
-              <div className="flex justify-between">
-                <span className="text-[#717171]">{language === 'id' ? 'Basis Studio:' : 'Current Base:'}</span>
-                <span className="text-[#F2EFE9]">{profile.location || t.about.currentBase}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#717171]">{language === 'id' ? 'Medium Utama:' : 'Primary Medium:'}</span>
-                <span className="text-[#F2EFE9]">{t.about.primaryMedium}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#717171]">{language === 'id' ? 'Cetakan Arsip:' : 'Print Archival:'}</span>
-                <span className="text-[#C6AA7B]">{t.about.printArchival}</span>
-              </div>
-            </div>
           </div>
 
           {/* Biography Column */}
@@ -194,42 +179,7 @@ export default function AboutPageClient({ initialProfile }: AboutPageClientProps
         </section>
 
         {/* ========================================================= */}
-        {/* 4. OPTICS & GEAR DISCIPLINE */}
-        {/* ========================================================= */}
-        <section className="py-24 border-b border-[#1d1d1d]">
-          <div className="max-w-3xl mb-12">
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#C6AA7B] block mb-2">
-              {t.about.apparatusBadge}
-            </span>
-            <h3 className="font-serif text-3xl sm:text-4xl text-[#F2EFE9] mb-4">
-              {t.about.apparatusTitle}
-            </h3>
-            <p className="text-sm text-[#A7A7A7] leading-relaxed">
-              {t.about.apparatusDesc}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {(profile.gear || staticProfile.gear).map((g, idx) => (
-              <div key={idx} className="bg-[#121212] border border-[#262626] p-6 space-y-4">
-                <span className="text-xs font-mono uppercase tracking-widest text-[#C6AA7B] block pb-2 border-b border-[#262626]">
-                  {g.category}
-                </span>
-                <ul className="space-y-2.5 text-xs font-mono text-[#A7A7A7]">
-                  {g.items.map((item, itemIdx) => (
-                    <li key={itemIdx} className="flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-[#C6AA7B]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================================= */}
-        {/* 5. CONTACT INVITATION */}
+        {/* 4. CONTACT INVITATION */}
         {/* ========================================================= */}
         <section className="pt-24 text-center max-w-2xl mx-auto space-y-6">
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#C6AA7B]">
