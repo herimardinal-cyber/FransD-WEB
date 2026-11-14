@@ -149,7 +149,7 @@ export default async function GalleryDetailPage({ params }: GalleryDetailPagePro
                 </div>
                 {project.client && (
                   <div>
-                    <span className="text-[#717171] uppercase tracking-wider block mb-1">Commission</span>
+                    <span className="text-[#717171] uppercase tracking-wider block mb-1">Client</span>
                     <span className="text-[#F2EFE9]">{project.client}</span>
                   </div>
                 )}
