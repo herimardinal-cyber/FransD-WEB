@@ -93,8 +93,8 @@ export default function ProjectForm({ initialData, existingCategories }: Project
     location: initialData?.location || '',
     client: initialData?.client || '',
     description: initialData?.description || '',
-    status: initialData?.status || 'DRAFT',
-    featured: initialData?.featured || false,
+    status: initialData?.status || 'PUBLISHED',
+    featured: initialData?.featured !== undefined ? initialData.featured : true,
     coverImage: initialData?.coverImage || '',
   });
 

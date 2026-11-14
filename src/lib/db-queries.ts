@@ -176,14 +176,33 @@ function mapPrismaEvent(e: PrismaEventWithCover): Event {
 
 export async function getDbFeaturedProjects(): Promise<PhotoProject[]> {
   try {
-    const projects = await prisma.photoProject.findMany({
+    let projects = await prisma.photoProject.findMany({
       where: { status: 'PUBLISHED', featured: true },
       include: {
         photos: { orderBy: { sortOrder: 'asc' } },
         coverImage: true,
       },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { createdAt: 'desc' },
+      take: 4,
     });
+
+    // If fewer than 4 featured projects, fill with newest published projects
+    if (projects.length < 4) {
+      const existingIds = projects.map((p) => p.id);
+      const additional = await prisma.photoProject.findMany({
+        where: {
+          status: 'PUBLISHED',
+          ...(existingIds.length > 0 && { id: { notIn: existingIds } }),
+        },
+        include: {
+          photos: { orderBy: { sortOrder: 'asc' } },
+          coverImage: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 4 - projects.length,
+      });
+      projects = [...projects, ...additional];
+    }
 
     if (projects && projects.length > 0) {
       return projects.map(mapPrismaProject);
@@ -203,7 +222,7 @@ export async function getDbAllProjects(category?: string): Promise<PhotoProject[
         photos: { orderBy: { sortOrder: 'asc' } },
         coverImage: true,
       },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     if (projects && projects.length > 0) {
@@ -215,9 +234,7 @@ export async function getDbAllProjects(category?: string): Promise<PhotoProject[
     console.warn('Falling back to static projects:', error);
   }
 
-  const published = mockProjects.filter((p) => p.status === 'PUBLISHED');
-  if (!category || category === 'All') return published;
-  return published.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  return mockProjects.filter((p) => p.status === 'PUBLISHED');
 }
 
 export async function getDbProjectBySlug(slug: string): Promise<PhotoProject | undefined> {
