@@ -55,9 +55,19 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   const { slug } = await params;
   const event = await getDbEventBySlug(slug);
 
-  if (!event) {
+    if (!event) {
     notFound();
   }
+
+  // Parse paragraphs from event description
+  const rawParagraphs = (event.description || '')
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.replace(/\s*\r?\n\s*/g, ' ').trim())
+    .filter(Boolean);
+
+  const firstParagraph = rawParagraphs[0] || '';
+  const cleanLead = firstParagraph.replace(/^[\"“]+|[\"”]+$/g, '').trim();
+  const additionalParagraphs = rawParagraphs.slice(1);
 
   const startDate = new Date(event.startsAt).toLocaleDateString('en-US', {
     month: 'long',
@@ -128,15 +138,25 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           {/* Main Description */}
           <div className="lg:col-span-7 space-y-8">
             <div>
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#C6AA7B] block mb-3">
+              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#C6AA7B] block mb-4">
                 Event Overview
               </span>
-              <p className="font-serif text-2xl text-[#F2EFE9] leading-relaxed italic mb-6">
-                &ldquo;{event.description}&rdquo;
-              </p>
-              <p className="text-sm sm:text-base text-[#A7A7A7] leading-relaxed">
-                The presentation features large-format archival prints rendered in platinum-palladium and carbon pigment, showcasing master-level tonal gradations. Attendees will have the opportunity to engage with detailed artist proofs, technical journals, and limited edition catalogues.
-              </p>
+
+              {/* Paragraf pertama: Bold */}
+              {cleanLead && (
+                <p className="font-serif text-xl sm:text-2xl text-[#F2EFE9] font-bold leading-relaxed mb-4">
+                  {cleanLead}
+                </p>
+              )}
+
+              {/* Paragraf selanjutnya: Text biasa (normal) */}
+              {additionalParagraphs.length > 0 && (
+                <div className="space-y-4 pt-1 font-sans text-sm sm:text-base text-[#A7A7A7] font-normal not-italic leading-relaxed">
+                  {additionalParagraphs.map((para, idx) => (
+                    <p key={idx}>{para}</p>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Schedule Section if available */}
