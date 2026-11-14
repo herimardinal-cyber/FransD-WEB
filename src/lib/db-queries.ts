@@ -70,7 +70,7 @@ function mapPrismaProject(proj: PrismaProjectWithPhotos): PhotoProject {
     title: proj.title,
     slug: proj.slug,
     description: proj.description,
-    longDescription: proj.longDescription || proj.description,
+    longDescription: proj.longDescription || undefined,
     category: (proj.category || 'Editorial') as ProjectCategory,
     year: proj.year,
     location: proj.location || 'Global',

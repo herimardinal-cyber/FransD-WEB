@@ -125,7 +125,7 @@ export default async function GalleryDetailPage({ params }: GalleryDetailPagePro
               <p className="font-serif text-2xl sm:text-3xl text-[#F2EFE9] leading-relaxed italic">
                 &ldquo;{project.description}&rdquo;
               </p>
-              {project.longDescription && (
+              {project.longDescription && project.longDescription !== project.description && (
                 <p className="text-sm sm:text-base text-[#A7A7A7] leading-relaxed pt-2">
                   {project.longDescription}
                 </p>
