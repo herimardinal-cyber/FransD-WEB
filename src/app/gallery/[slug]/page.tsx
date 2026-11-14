@@ -62,6 +62,25 @@ export default async function GalleryDetailPage({ params }: GalleryDetailPagePro
 
   const relatedProjects = await getDbRelatedProjects(slug, 2);
 
+  // Parse paragraphs from description (and longDescription if present)
+  const rawParagraphs = (project.description || '')
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.replace(/\s*\r?\n\s*/g, ' ').trim())
+    .filter(Boolean);
+
+  const firstParagraph = rawParagraphs[0] || '';
+  const cleanLead = firstParagraph.replace(/^["“]+|["”]+$/g, '').trim();
+
+  const additionalParagraphs = [
+    ...rawParagraphs.slice(1),
+    ...(project.longDescription && project.longDescription !== project.description
+      ? project.longDescription
+          .split(/\r?\n\s*\r?\n/)
+          .map((p) => p.replace(/\s*\r?\n\s*/g, ' ').trim())
+          .filter(Boolean)
+      : []),
+  ];
+
   return (
     <article className="min-h-screen bg-[#080808] text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
       {/* ========================================================= */}
@@ -122,13 +141,21 @@ export default async function GalleryDetailPage({ params }: GalleryDetailPagePro
               <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#C6AA7B] block">
                 Series Synopsis
               </span>
-              <p className="font-serif text-2xl sm:text-3xl text-[#F2EFE9] leading-relaxed italic">
-                &ldquo;{project.description}&rdquo;
-              </p>
-              {project.longDescription && project.longDescription !== project.description && (
-                <p className="text-sm sm:text-base text-[#A7A7A7] leading-relaxed pt-2">
-                  {project.longDescription}
+
+              {/* Paragraf pertama: Bold & Miring (Italic) */}
+              {cleanLead && (
+                <p className="font-serif text-xl sm:text-2xl text-[#F2EFE9] font-bold italic leading-relaxed">
+                  &ldquo;{cleanLead}&rdquo;
                 </p>
+              )}
+
+              {/* Paragraf selanjutnya: Normal */}
+              {additionalParagraphs.length > 0 && (
+                <div className="space-y-4 pt-2 font-sans text-sm sm:text-base text-[#A7A7A7] font-normal not-italic leading-relaxed">
+                  {additionalParagraphs.map((para, idx) => (
+                    <p key={idx}>{para}</p>
+                  ))}
+                </div>
               )}
             </div>
 
