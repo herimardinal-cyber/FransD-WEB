@@ -37,6 +37,8 @@ export async function PUT(request: NextRequest) {
       location,
       email,
       phone,
+      awardsJson,
+      exhibitionsJson,
     } = data;
 
     const existing = await prisma.photographerProfile.findFirst();
@@ -49,6 +51,18 @@ export async function PUT(request: NextRequest) {
     const finalPhilosophy = philosophy || statement || '';
     const finalPhilosophyId = philosophyId !== undefined ? philosophyId : null;
     const finalPortrait = portraitImageUrl || portraitUrl || null;
+    const finalAwardsJson =
+      awardsJson !== undefined
+        ? typeof awardsJson === 'string'
+          ? awardsJson
+          : JSON.stringify(awardsJson)
+        : existing?.awardsJson || null;
+    const finalExhibitionsJson =
+      exhibitionsJson !== undefined
+        ? typeof exhibitionsJson === 'string'
+          ? exhibitionsJson
+          : JSON.stringify(exhibitionsJson)
+        : existing?.exhibitionsJson || null;
 
     const updated = existing
       ? await prisma.photographerProfile.update({
@@ -65,6 +79,8 @@ export async function PUT(request: NextRequest) {
           location: location || 'Zurich, Switzerland',
           email: email || 'studio@fransdelian.com',
           phone: phone || '+41 44 210 88 44',
+          awardsJson: finalAwardsJson,
+          exhibitionsJson: finalExhibitionsJson,
         },
       })
       : await prisma.photographerProfile.create({
@@ -81,6 +97,8 @@ export async function PUT(request: NextRequest) {
           location: location || 'Zurich, Switzerland',
           email: email || 'studio@fransdelian.com',
           phone: phone || '+41 44 210 88 44',
+          awardsJson: finalAwardsJson,
+          exhibitionsJson: finalExhibitionsJson,
         },
       });
 

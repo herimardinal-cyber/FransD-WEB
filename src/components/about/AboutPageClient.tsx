@@ -158,7 +158,7 @@ export default function AboutPageClient({ initialProfile }: AboutPageClientProps
               <div className="flex items-center gap-2 mb-8 pb-3 border-b border-[#262626]">
                 <MapPin className="w-5 h-5 text-[#C6AA7B]" />
                 <h3 className="font-serif text-3xl text-[#F2EFE9]">
-                  {language === 'id' ? 'Pameran Pilihan' : 'Selected Exhibitions'}
+                  {t.about.exhibitionsTitle}
                 </h3>
               </div>
               <div className="space-y-6">

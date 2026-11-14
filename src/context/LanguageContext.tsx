@@ -108,6 +108,7 @@ export interface Translations {
     apparatusDesc: string;
     honorsBadge: string;
     honorsTitle: string;
+    exhibitionsTitle: string;
     honorsDesc: string;
   };
   contact: {
@@ -276,7 +277,8 @@ const translations: Record<Language, Translations> = {
       apparatusDesc:
         'Crafted through pure mechanical precision and archival analog & digital mediums without digital manipulation.',
       honorsBadge: 'Recognition',
-      honorsTitle: 'Selected Honors & Exhibitions',
+      honorsTitle: 'Selected Honors',
+      exhibitionsTitle: 'Exhibitions',
       honorsDesc: 'A record of institutional solo retrospectives and global photography honors.',
     },
     contact: {
@@ -446,7 +448,8 @@ const translations: Record<Language, Translations> = {
       apparatusDesc:
         'Diciptakan melalui ketepatan mekanik murni serta medium analog & digital arsip tanpa manipulasi sintetis.',
       honorsBadge: 'Apresiasi',
-      honorsTitle: 'Penghargaan & Pameran Terpilih',
+      honorsTitle: 'Penghargaan Terpilih',
+      exhibitionsTitle: 'Pameran',
       honorsDesc: 'Rekam jejak pameran tunggal institusional dan penghargaan fotografi prestisius dunia.',
     },
     contact: {

@@ -55,6 +55,30 @@ export default async function AboutPage() {
       }
     }
 
+    let awards = staticProfile.awards;
+    if (dbProfile.awardsJson) {
+      try {
+        const parsed = JSON.parse(dbProfile.awardsJson);
+        if (Array.isArray(parsed)) {
+          awards = parsed;
+        }
+      } catch (e) {
+        console.warn('Failed to parse awardsJson:', e);
+      }
+    }
+
+    let exhibitions = staticProfile.exhibitions;
+    if (dbProfile.exhibitionsJson) {
+      try {
+        const parsed = JSON.parse(dbProfile.exhibitionsJson);
+        if (Array.isArray(parsed)) {
+          exhibitions = parsed;
+        }
+      } catch (e) {
+        console.warn('Failed to parse exhibitionsJson:', e);
+      }
+    }
+
     profileData = {
       ...staticProfile,
       displayName: dbProfile.displayName,
@@ -70,6 +94,8 @@ export default async function AboutPage() {
       portraitImage: dbProfile.portraitImageUrl
         ? { ...staticProfile.portraitImage, url: dbProfile.portraitImageUrl }
         : staticProfile.portraitImage,
+      awards,
+      exhibitions,
     };
   }
 
