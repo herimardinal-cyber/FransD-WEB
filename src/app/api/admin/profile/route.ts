@@ -39,6 +39,7 @@ export async function PUT(request: NextRequest) {
       phone,
       awardsJson,
       exhibitionsJson,
+      homeSettings,
     } = data;
 
     const existing = await prisma.photographerProfile.findFirst();
@@ -102,13 +103,24 @@ export async function PUT(request: NextRequest) {
         },
       });
 
+    if (homeSettings && typeof homeSettings === 'object') {
+      const settingUpdates = Object.entries(homeSettings).map(([key, value]) =>
+        prisma.siteSetting.upsert({
+          where: { key },
+          update: { value: String(value) },
+          create: { key, value: String(value) },
+        })
+      );
+      await prisma.$transaction(settingUpdates);
+    }
+
     await recordAuditLog(admin.id, 'UPDATE_PROFILE', 'PhotographerProfile', updated.id, {
       name: finalName,
     });
 
     try {
-      revalidatePath('/about');
       revalidatePath('/');
+      revalidatePath('/about');
     } catch (e) {
       console.warn('Revalidation error:', e);
     }

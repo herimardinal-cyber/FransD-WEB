@@ -11,14 +11,22 @@ interface HomePageClientProps {
   featuredProjects: PhotoProject[];
   stories: Story[];
   landingEvents: Event[];
+  profile?: {
+    portraitImageUrl?: string | null;
+    displayName?: string;
+    location?: string;
+  } | null;
+  settings?: Record<string, string>;
 }
 
 export default function HomePageClient({
   featuredProjects,
   stories,
   landingEvents,
+  profile,
+  settings,
 }: HomePageClientProps) {
-  const { t, formatDate } = useLanguage();
+  const { t, language, formatDate } = useLanguage();
   const recentStories = stories.slice(0, 3);
 
   return (
@@ -187,8 +195,8 @@ export default function HomePageClient({
             <div className="lg:col-span-5 relative">
               <div className="relative aspect-[4/5] w-full max-w-md mx-auto overflow-hidden bg-[#171717] border border-[#262626] shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=90"
-                  alt="Portrait of Frans Delian"
+                  src={profile?.portraitImageUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=90"}
+                  alt={profile?.displayName ? `Portrait of ${profile.displayName}` : "Portrait of Frans Delian"}
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover filter contrast-[1.1] grayscale hover:grayscale-0 transition-all duration-700"
@@ -196,7 +204,7 @@ export default function HomePageClient({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               </div>
               <div className="absolute -bottom-6 -right-6 hidden sm:block p-4 bg-[#080808] border border-[#262626] text-[10px] font-mono tracking-widest uppercase text-[#C6AA7B]">
-                Zurich Atelier • Worldwide
+                {settings?.atelier_location || (profile?.location ? `${profile.location} • Worldwide` : "Zurich Atelier • Worldwide")}
               </div>
             </div>
 
@@ -207,11 +215,15 @@ export default function HomePageClient({
               </span>
 
               <blockquote className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#F2EFE9] leading-[1.25] font-light italic">
-                {t.home.artistQuote}
+                {language === 'id'
+                  ? (settings?.home_artist_quote_id || t.home.artistQuote)
+                  : (settings?.home_artist_quote || t.home.artistQuote)}
               </blockquote>
 
               <p className="text-[#A7A7A7] text-sm sm:text-base leading-relaxed font-sans pt-2">
-                {t.home.artistBioSnippet}
+                {language === 'id'
+                  ? (settings?.home_bio_snippet_id || t.home.artistBioSnippet)
+                  : (settings?.home_bio_snippet || t.home.artistBioSnippet)}
               </p>
 
               <div className="pt-6 flex flex-wrap items-center gap-6">
@@ -234,19 +246,27 @@ export default function HomePageClient({
               {/* Minimal Metrics */}
               <div className="grid grid-cols-3 gap-6 pt-10 border-t border-[#1d1d1d]">
                 <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">15+</span>
+                  <span className="font-serif text-3xl text-[#F2EFE9]">
+                    {(settings?.stat_years_in_field || '15+').split(' ')[0]}
+                  </span>
                   <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
                     {t.home.yearsInField}
                   </span>
                 </div>
                 <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">PX3</span>
+                  <span className="font-serif text-3xl text-[#F2EFE9]">
+                    {(settings?.stat_awards || 'PX3').split(' ')[0]}
+                  </span>
                   <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
-                    Gold Winner 2025
+                    {(settings?.stat_awards || '').includes(' ')
+                      ? (settings?.stat_awards || '').substring((settings?.stat_awards || '').indexOf(' ') + 1)
+                      : 'Gold Winner 2025'}
                   </span>
                 </div>
                 <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">40+</span>
+                  <span className="font-serif text-3xl text-[#F2EFE9]">
+                    {(settings?.stat_exhibitions || '40+').split(' ')[0]}
+                  </span>
                   <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
                     {t.home.globalExhibitions}
                   </span>

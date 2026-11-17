@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSessionAdmin, recordAuditLog } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -43,6 +44,13 @@ export async function PUT(request: NextRequest) {
     await recordAuditLog(admin.id, 'UPDATE_SETTINGS', 'SiteSetting', 'global', {
       updatedKeys: Object.keys(settings),
     });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/about');
+    } catch (e) {
+      console.warn('Revalidation error:', e);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

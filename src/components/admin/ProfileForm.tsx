@@ -62,7 +62,13 @@ interface ProfileData {
   exhibitionsJson?: string | null;
 }
 
-export default function ProfileForm({ initialData }: { initialData?: ProfileData | null }) {
+export default function ProfileForm({
+  initialData,
+  initialSettings,
+}: {
+  initialData?: ProfileData | null;
+  initialSettings?: Record<string, string>;
+}) {
   const router = useRouter();
   const [activeLangTab, setActiveLangTab] = useState<'en' | 'id'>('en');
 
@@ -100,6 +106,21 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
     location: initialData?.location || 'Zurich, Switzerland',
     email: initialData?.email || 'studio@fransdelian.com',
     phone: initialData?.phone || '',
+  });
+
+  const [homeSettings, setHomeSettings] = useState({
+    home_artist_quote:
+      initialSettings?.home_artist_quote ||
+      '“Photography is an exercise in prolonged listening to what light leaves unsaid.”',
+    home_artist_quote_id:
+      initialSettings?.home_artist_quote_id ||
+      '“Fotografi adalah latihan mendengarkan secara mendalam apa yang tersirat di balik cahaya.”',
+    home_bio_snippet:
+      initialSettings?.home_bio_snippet ||
+      'Frans Delian is an international documentary and fine art photographer. Traveling to remote archipelagos, desert labyrinths, and megalopolis frontiers, his work captures moments of authenticity where human emotion meets unyielding atmosphere without staged intervention.',
+    home_bio_snippet_id:
+      initialSettings?.home_bio_snippet_id ||
+      'Frans Delian adalah fotografer seni murni dan dokumenter internasional. Menjelajahi kepulauan terpencil, labirin gurun, hingga perbatasan megapolitan, karyanya mengabadikan momen kejujuran: saat emosi manusia dan suasana alam menyatu tanpa rekayasa.',
   });
 
   const [awards, setAwards] = useState<AwardItem[]>(() =>
@@ -216,6 +237,7 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
         ...formData,
         awardsJson: JSON.stringify(awards),
         exhibitionsJson: JSON.stringify(exhibitions),
+        homeSettings,
       };
 
       const res = await fetch('/api/admin/profile', {
@@ -266,11 +288,10 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
 
       {message && (
         <div
-          className={`p-4 border text-xs flex items-center gap-3 ${
-            message.type === 'success'
-              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
-              : 'bg-red-950/40 border-red-800/60 text-red-300'
-          }`}
+          className={`p-4 border text-xs flex items-center gap-3 ${message.type === 'success'
+            ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
+            : 'bg-red-950/40 border-red-800/60 text-red-300'
+            }`}
         >
           {message.type === 'success' ? (
             <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -291,22 +312,20 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
           <button
             type="button"
             onClick={() => setActiveLangTab('en')}
-            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${
-              activeLangTab === 'en'
-                ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
-                : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
-            }`}
+            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${activeLangTab === 'en'
+              ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
+              : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
+              }`}
           >
             English (EN)
           </button>
           <button
             type="button"
             onClick={() => setActiveLangTab('id')}
-            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${
-              activeLangTab === 'id'
-                ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
-                : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
-            }`}
+            className={`px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all ${activeLangTab === 'id'
+              ? 'bg-[#C6AA7B] text-[#080808] font-semibold shadow-md'
+              : 'bg-[#171717] text-[#A7A7A7] hover:text-[#F2EFE9] border border-[#262626]'
+              }`}
           >
             Bahasa Indonesia (ID)
           </button>
@@ -436,6 +455,85 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
               </>
             )}
           </div>
+
+          {/* ========================================================= */}
+          {/* HOMEPAGE SPOTLIGHT (FOTOGRAFER & FILOSOFI HALAMAN DEPAN) */}
+          {/* ========================================================= */}
+          <div className="bg-[#121212] border border-[#222] p-6 space-y-5">
+            <h3 className="font-serif text-xl text-[#F2EFE9] border-b border-[#1C1C1C] pb-3 flex items-center justify-between">
+              <div>
+                <span>Homepage Spotlight (Fotografer & Filosofi)</span>
+                <span className="text-xs font-mono text-[#717171] block font-normal mt-0.5">
+                  Kutipan besar & ringkasan biografi yang tampil pada section &quot;Fotografer & Filosofi&quot; di Halaman Depan (Home).
+                </span>
+              </div>
+              <span className="text-xs font-mono text-[#C6AA7B] uppercase tracking-widest shrink-0">
+                [{activeLangTab.toUpperCase()}]
+              </span>
+            </h3>
+
+            {activeLangTab === 'en' ? (
+              <>
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Homepage Featured Quote (English)</span>
+                    <span className="text-[#C6AA7B] font-mono">[EN]</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={homeSettings.home_artist_quote}
+                    onChange={(e) => setHomeSettings({ ...homeSettings, home_artist_quote: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-sm focus:outline-none italic font-serif"
+                    placeholder="Photography is an exercise in prolonged listening to what light leaves unsaid."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Homepage Bio Snippet (English)</span>
+                    <span className="text-[#C6AA7B] font-mono">[EN]</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={homeSettings.home_bio_snippet}
+                    onChange={(e) => setHomeSettings({ ...homeSettings, home_bio_snippet: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-sm focus:outline-none font-sans leading-relaxed"
+                    placeholder="Frans Delian is an international documentary and fine art photographer..."
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Kutipan Utama Halaman Depan (Bahasa Indonesia)</span>
+                    <span className="text-[#C6AA7B] font-mono">[ID]</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={homeSettings.home_artist_quote_id}
+                    onChange={(e) => setHomeSettings({ ...homeSettings, home_artist_quote_id: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-sm focus:outline-none italic font-serif"
+                    placeholder="Fotografi adalah latihan mendengarkan secara mendalam apa yang tersirat di balik cahaya."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                    <span>Ringkasan Biografi Halaman Depan (Bahasa Indonesia)</span>
+                    <span className="text-[#C6AA7B] font-mono">[ID]</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={homeSettings.home_bio_snippet_id}
+                    onChange={(e) => setHomeSettings({ ...homeSettings, home_bio_snippet_id: e.target.value })}
+                    className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-sm focus:outline-none font-sans leading-relaxed"
+                    placeholder="Frans Delian adalah fotografer seni murni dan dokumenter internasional. Menjelajahi kepulauan terpencil..."
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Contact & Media */}
@@ -447,9 +545,14 @@ Setiap cetakan seni murni dibuat secara manual menggunakan metode platinum-palla
 
             {/* Portrait Preview & Upload */}
             <div>
-              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Portrait Photo URL
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7]">
+                  Portrait Photo URL
+                </label>
+                <span className="text-[10px] font-mono text-[#C6AA7B]">
+                  • Tampil di Home & About
+                </span>
+              </div>
               <input
                 type="text"
                 value={formData.portraitImageUrl || ''}

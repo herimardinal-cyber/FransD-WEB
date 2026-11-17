@@ -30,6 +30,18 @@ export default function SettingsForm({
     stat_years_in_field: initialSettings.stat_years_in_field || '15+ Years in Field',
     stat_exhibitions: initialSettings.stat_exhibitions || '40+ Global Exhibitions',
     stat_awards: initialSettings.stat_awards || 'PX3 Gold Winner 2025',
+    home_artist_quote:
+      initialSettings.home_artist_quote ||
+      '“Photography is an exercise in prolonged listening to what light leaves unsaid.”',
+    home_artist_quote_id:
+      initialSettings.home_artist_quote_id ||
+      '“Fotografi adalah latihan mendengarkan secara mendalam apa yang tersirat di balik cahaya.”',
+    home_bio_snippet:
+      initialSettings.home_bio_snippet ||
+      'Frans Delian is an international documentary and fine art photographer. Traveling to remote archipelagos, desert labyrinths, and megalopolis frontiers, his work captures moments of authenticity where human emotion meets unyielding atmosphere without staged intervention.',
+    home_bio_snippet_id:
+      initialSettings.home_bio_snippet_id ||
+      'Frans Delian adalah fotografer seni murni dan dokumenter internasional. Menjelajahi kepulauan terpencil, labirin gurun, hingga perbatasan megapolitan, karyanya mengabadikan momen kejujuran: saat emosi manusia dan suasana alam menyatu tanpa rekayasa.',
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -194,6 +206,74 @@ export default function SettingsForm({
                 value={settings.stat_awards}
                 onChange={(e) => handleChange('stat_awards', e.target.value)}
                 className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Homepage Spotlight */}
+        <div className="bg-[#121212] border border-[#222] p-6 space-y-5">
+          <h3 className="font-serif text-xl text-[#F2EFE9] border-b border-[#1C1C1C] pb-3">
+            <div>
+              <span>Homepage Spotlight (Fotografer & Filosofi)</span>
+              <span className="text-xs font-mono text-[#717171] block font-normal mt-0.5">
+                Kutipan dan ringkasan biografi yang tampil pada section &quot;Fotografer & Filosofi&quot; di Halaman Depan.
+              </span>
+            </div>
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                <span>Featured Quote (English)</span>
+                <span className="text-[#C6AA7B] font-mono">[EN]</span>
+              </label>
+              <textarea
+                rows={3}
+                value={settings.home_artist_quote}
+                onChange={(e) => handleChange('home_artist_quote', e.target.value)}
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-xs focus:outline-none font-serif italic"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                <span>Kutipan Utama (Bahasa Indonesia)</span>
+                <span className="text-[#C6AA7B] font-mono">[ID]</span>
+              </label>
+              <textarea
+                rows={3}
+                value={settings.home_artist_quote_id}
+                onChange={(e) => handleChange('home_artist_quote_id', e.target.value)}
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-xs focus:outline-none font-serif italic"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                <span>Bio Snippet (English)</span>
+                <span className="text-[#C6AA7B] font-mono">[EN]</span>
+              </label>
+              <textarea
+                rows={4}
+                value={settings.home_bio_snippet}
+                onChange={(e) => handleChange('home_bio_snippet', e.target.value)}
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-xs focus:outline-none font-sans leading-relaxed"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex justify-between">
+                <span>Ringkasan Biografi (Bahasa Indonesia)</span>
+                <span className="text-[#C6AA7B] font-mono">[ID]</span>
+              </label>
+              <textarea
+                rows={4}
+                value={settings.home_bio_snippet_id}
+                onChange={(e) => handleChange('home_bio_snippet_id', e.target.value)}
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-3 text-xs focus:outline-none font-sans leading-relaxed"
               />
             </div>
           </div>
