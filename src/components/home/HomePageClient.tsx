@@ -203,9 +203,6 @@ export default function HomePageClient({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               </div>
-              <div className="absolute -bottom-6 -right-6 hidden sm:block p-4 bg-[#080808] border border-[#262626] text-[10px] font-mono tracking-widest uppercase text-[#C6AA7B]">
-                {settings?.atelier_location || (profile?.location ? `${profile.location} • Worldwide` : "Zurich Atelier • Worldwide")}
-              </div>
             </div>
 
             {/* Philosophy Text */}
@@ -241,36 +238,6 @@ export default function HomePageClient({
                   <span>{t.home.explorePhilosophy}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-              </div>
-
-              {/* Minimal Metrics */}
-              <div className="grid grid-cols-3 gap-6 pt-10 border-t border-[#1d1d1d]">
-                <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">
-                    {(settings?.stat_years_in_field || '15+').split(' ')[0]}
-                  </span>
-                  <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
-                    {t.home.yearsInField}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">
-                    {(settings?.stat_awards || 'PX3').split(' ')[0]}
-                  </span>
-                  <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
-                    {(settings?.stat_awards || '').includes(' ')
-                      ? (settings?.stat_awards || '').substring((settings?.stat_awards || '').indexOf(' ') + 1)
-                      : 'Gold Winner 2025'}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-serif text-3xl text-[#F2EFE9]">
-                    {(settings?.stat_exhibitions || '40+').split(' ')[0]}
-                  </span>
-                  <span className="block text-[10px] uppercase font-mono tracking-widest text-[#717171] mt-1">
-                    {t.home.globalExhibitions}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
