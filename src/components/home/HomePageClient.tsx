@@ -127,17 +127,17 @@ export default function HomePageClient({
               index === 0
                 ? 'md:col-span-8'
                 : index === 1
-                ? 'md:col-span-4'
-                : index === 2
-                ? 'md:col-span-5'
-                : 'md:col-span-7';
+                  ? 'md:col-span-4'
+                  : index === 2
+                    ? 'md:col-span-5'
+                    : 'md:col-span-7';
 
             const aspect =
               index === 1
                 ? 'aspect-[4/5]'
                 : index === 0
-                ? 'aspect-[16/10]'
-                : 'aspect-[16/11]';
+                  ? 'aspect-[16/10]'
+                  : 'aspect-[16/11]';
 
             return (
               <div key={project.id} className={`${colSpan} group flex flex-col`}>
@@ -154,7 +154,7 @@ export default function HomePageClient({
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
-                    
+
                     <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-[#080808]/70 backdrop-blur-md border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <ArrowUpRight className="w-4 h-4 text-[#C6AA7B]" />
                     </div>

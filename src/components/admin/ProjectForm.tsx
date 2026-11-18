@@ -42,6 +42,7 @@ interface ProjectData {
   location?: string | null;
   client?: string | null;
   description: string;
+  longDescription?: string | null;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   featured: boolean;
   coverImage?: string | null;
@@ -93,6 +94,7 @@ export default function ProjectForm({ initialData, existingCategories }: Project
     location: initialData?.location || '',
     client: initialData?.client || '',
     description: initialData?.description || '',
+    longDescription: initialData?.longDescription || '',
     status: initialData?.status || 'PUBLISHED',
     featured: initialData?.featured !== undefined ? initialData.featured : true,
     coverImage: initialData?.coverImage || '',
@@ -559,18 +561,37 @@ export default function ProjectForm({ initialData, existingCategories }: Project
               </div>
             </div>
 
-            {/* Description */}
+            {/* Description (Paragraf 1 - Bold Miring) */}
             <div>
-              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Editorial Statement & Curatorial Notes
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex items-center justify-between">
+                <span>Series Synopsis (Paragraf 1 — Bold &amp; Miring)</span>
+                <span className="text-[#C6AA7B] font-mono text-[11px]">[Lead Synopsis]</span>
+              </label>
+              <textarea
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Tulis kalimat pembuka / sinopsis utama (ditampilkan tebal dan miring di halaman galeri)..."
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-serif italic"
+              />
+            </div>
+
+            {/* Long Description (Paragraf 2+ — Teks Normal) */}
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2 flex items-center justify-between">
+                <span>Extended Narrative (Paragraf 2 &amp; Seterusnya — Teks Normal)</span>
+                <span className="text-[#717171] font-mono text-[11px]">[Paragraf Lanjutan]</span>
               </label>
               <textarea
                 rows={6}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="High-contrast monochrome studies dissecting the monumental geometry..."
-                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed"
+                value={formData.longDescription || ''}
+                onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
+                placeholder="Tulis narasi lanjutan atau catatan kuratorial di sini (ditampilkan sebagai paragraf kedua dan seterusnya dengan teks biasa)..."
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] p-4 text-sm focus:outline-none resize-y leading-relaxed font-sans"
               />
+              <span className="text-[11px] font-mono text-[#717171] block mt-1">
+                Catatan: Anda juga dapat menulis beberapa paragraf langsung di field atas dengan spasi enter (baris baru ganda).
+              </span>
             </div>
           </div>
         </div>
