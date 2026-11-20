@@ -449,3 +449,31 @@ export async function getDbEventBySlug(slug: string): Promise<Event | undefined>
 
   return mockEvents.find((e) => e.slug === slug);
 }
+
+export async function getDbSiteSettings(): Promise<Record<string, string>> {
+  try {
+    const settings = await prisma.siteSetting.findMany();
+    const map: Record<string, string> = {};
+    settings.forEach((s) => {
+      map[s.key] = s.value;
+    });
+    return map;
+  } catch (error) {
+    console.warn('Falling back to static site settings:', error);
+    return {};
+  }
+}
+
+export async function getDbPhotographerProfile(): Promise<{ location?: string; email?: string } | null> {
+  try {
+    const profile = await prisma.photographerProfile.findFirst();
+    if (!profile) return null;
+    return {
+      location: profile.location,
+      email: profile.email,
+    };
+  } catch (error) {
+    console.warn('Falling back to static photographer profile:', error);
+    return null;
+  }
+}

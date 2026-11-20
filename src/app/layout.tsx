@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import './globals.css';
 import { siteSettings } from '@/data';
+import { getDbPhotographerProfile, getDbSiteSettings } from '@/lib/db-queries';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -68,18 +69,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [profile, settings] = await Promise.all([
+    getDbPhotographerProfile(),
+    getDbSiteSettings(),
+  ]);
+
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#080808] text-[#F2EFE9] font-sans selection:bg-[#C6AA7B] selection:text-[#080808]">
         <LanguageProvider>
           <Navigation />
-        <main className="flex-1 w-full">{children}</main>
-        <Footer />
+          <main className="flex-1 w-full">{children}</main>
+          <Footer initialSettings={settings} initialProfile={profile} />
         </LanguageProvider>
       </body>
     </html>

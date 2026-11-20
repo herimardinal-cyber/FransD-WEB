@@ -8,13 +8,52 @@ import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 
-export default function Footer() {
+interface FooterProps {
+  initialSettings?: Record<string, string>;
+  initialProfile?: {
+    email?: string;
+    location?: string;
+  } | null;
+}
+
+export default function Footer({ initialSettings, initialProfile }: FooterProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
 
   if (pathname?.startsWith('/admin')) {
     return null;
   }
+
+  const studioLocation =
+    initialSettings?.atelier_location ||
+    initialProfile?.location ||
+    'Zurich, Switzerland';
+
+  const studioEmail =
+    initialSettings?.contact_email ||
+    initialProfile?.email ||
+    profile.email ||
+    'studio@fransdelian.com';
+
+  // Construct dynamic social links list
+  const socialList: { platform: string; url: string }[] = [];
+
+  const igUrl = initialSettings?.social_instagram || 'https://instagram.com/fransdelian';
+  if (igUrl) socialList.push({ platform: 'INSTAGRAM', url: igUrl });
+
+  const pxUrl = initialSettings?.social_500px || 'https://500px.com/fransdelian';
+  if (pxUrl) socialList.push({ platform: '500PX', url: pxUrl });
+
+  const behanceUrl = initialSettings?.social_behance || 'https://behance.net/fransdelian';
+  if (behanceUrl) socialList.push({ platform: 'BEHANCE', url: behanceUrl });
+
+  const vscoUrl = initialSettings?.social_vsco || 'https://vsco.co/fransdelian';
+  if (vscoUrl) socialList.push({ platform: 'VSCO', url: vscoUrl });
+
+  const linkedinUrl = initialSettings?.social_linkedin;
+  if (linkedinUrl) socialList.push({ platform: 'LINKEDIN', url: linkedinUrl });
+
+  const activeSocials = socialList.length > 0 ? socialList : profile.socialLinks.map(s => ({ platform: s.platform.toUpperCase(), url: s.url }));
 
   return (
     <footer className="border-t border-[#262626] bg-[#080808] text-[#F2EFE9] pt-20 pb-12 transition-colors">
@@ -80,12 +119,12 @@ export default function Footer() {
               {t.footer.representation}
             </span>
             <div className="text-sm text-[#A7A7A7] space-y-2">
-              <p>Studio: Zurich, Switzerland</p>
+              <p>Studio: {studioLocation}</p>
               <a
-                href={`mailto:${profile.email}`}
+                href={`mailto:${studioEmail}`}
                 className="text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors flex items-center gap-1.5 font-mono text-xs pt-1"
               >
-                <span>{profile.email}</span>
+                <span>{studioEmail}</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#C6AA7B]" />
               </a>
             </div>
@@ -95,7 +134,7 @@ export default function Footer() {
                 {t.footer.socialNetworks}
               </span>
               <div className="flex flex-wrap gap-4 text-xs tracking-wider uppercase text-[#A7A7A7]">
-                {profile.socialLinks.map((s) => (
+                {activeSocials.map((s) => (
                   <a
                     key={s.platform}
                     href={s.url}

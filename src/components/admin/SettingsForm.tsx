@@ -35,6 +35,8 @@ export default function SettingsForm({
     atelier_location: initialSettings.atelier_location || 'Zurich, Switzerland',
     social_instagram: initialSettings.social_instagram || 'https://instagram.com/fransdelian',
     social_behance: initialSettings.social_behance || 'https://behance.net/fransdelian',
+    social_500px: initialSettings.social_500px || 'https://500px.com/fransdelian',
+    social_vsco: initialSettings.social_vsco || 'https://vsco.co/fransdelian',
     social_linkedin: initialSettings.social_linkedin || 'https://linkedin.com/in/fransdelian',
     stat_years_in_field: initialSettings.stat_years_in_field || '15+ Years in Field',
     stat_exhibitions: initialSettings.stat_exhibitions || '40+ Global Exhibitions',
@@ -537,47 +539,122 @@ export default function SettingsForm({
           </div>
         </div>
 
-        {/* Social Channels */}
-        <div className="bg-[#121212] border border-[#222] p-6 space-y-5">
-          <h3 className="font-serif text-xl text-[#F2EFE9] border-b border-[#1C1C1C] pb-3">
-            Channels & Atelier
-          </h3>
+        {/* Representasi, Kontak & Jejaring Sosial (Footer Info) */}
+        <div className="bg-[#121212] border border-[#222] p-6 space-y-6">
+          <div className="border-b border-[#1C1C1C] pb-3">
+            <h3 className="font-serif text-xl text-[#F2EFE9]">
+              Representasi, Kontak & Jejaring Sosial (Footer Website)
+            </h3>
+            <p className="text-xs font-mono text-[#717171] mt-0.5">
+              Kelola teks Studio, Email, dan link Jejaring Sosial yang tampil pada bagian footer di seluruh halaman website.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Studio & Email */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Instagram URL
+                Studio / Lokasi Atelier (Tampil di &quot;Studio: ...&quot;)
               </label>
               <input
-                type="url"
-                value={settings.social_instagram}
-                onChange={(e) => handleChange('social_instagram', e.target.value)}
+                type="text"
+                value={settings.atelier_location}
+                onChange={(e) => handleChange('atelier_location', e.target.value)}
+                placeholder="Zurich, Switzerland"
                 className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
               />
+              <span className="text-[10px] text-[#666] font-mono mt-1 block">
+                Contoh: Zurich, Switzerland atau Aceh, Indonesia
+              </span>
             </div>
 
             <div>
               <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Behance URL
+                Email Resmi Studio (Tampil di link footer)
               </label>
               <input
-                type="url"
-                value={settings.social_behance}
-                onChange={(e) => handleChange('social_behance', e.target.value)}
+                type="email"
+                value={settings.contact_email}
+                onChange={(e) => handleChange('contact_email', e.target.value)}
+                placeholder="studio@fransdelian.com"
                 className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
               />
+              <span className="text-[10px] text-[#666] font-mono mt-1 block">
+                Contoh: studio@fransdelian.com
+              </span>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                LinkedIn URL
-              </label>
-              <input
-                type="url"
-                value={settings.social_linkedin}
-                onChange={(e) => handleChange('social_linkedin', e.target.value)}
-                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
-              />
+          {/* Social Links */}
+          <div className="pt-2">
+            <h4 className="text-xs uppercase font-mono tracking-wider text-[#C6AA7B] mb-3">
+              Tautan Jejaring Sosial (Footer Social Networks)
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                  Instagram URL
+                </label>
+                <input
+                  type="url"
+                  value={settings.social_instagram}
+                  onChange={(e) => handleChange('social_instagram', e.target.value)}
+                  placeholder="https://instagram.com/fransdelian"
+                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                  500px URL
+                </label>
+                <input
+                  type="url"
+                  value={settings.social_500px}
+                  onChange={(e) => handleChange('social_500px', e.target.value)}
+                  placeholder="https://500px.com/fransdelian"
+                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                  Behance URL
+                </label>
+                <input
+                  type="url"
+                  value={settings.social_behance}
+                  onChange={(e) => handleChange('social_behance', e.target.value)}
+                  placeholder="https://behance.net/fransdelian"
+                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                  VSCO URL
+                </label>
+                <input
+                  type="url"
+                  value={settings.social_vsco}
+                  onChange={(e) => handleChange('social_vsco', e.target.value)}
+                  placeholder="https://vsco.co/fransdelian"
+                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                  LinkedIn URL
+                </label>
+                <input
+                  type="url"
+                  value={settings.social_linkedin}
+                  onChange={(e) => handleChange('social_linkedin', e.target.value)}
+                  placeholder="https://linkedin.com/in/fransdelian"
+                  className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+                />
+              </div>
             </div>
           </div>
         </div>
