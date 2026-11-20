@@ -464,13 +464,20 @@ export async function getDbSiteSettings(): Promise<Record<string, string>> {
   }
 }
 
-export async function getDbPhotographerProfile(): Promise<{ location?: string; email?: string } | null> {
+export async function getDbPhotographerProfile(): Promise<{
+  location?: string;
+  email?: string;
+  phone?: string;
+  socialLinksJson?: string | null;
+} | null> {
   try {
     const profile = await prisma.photographerProfile.findFirst();
     if (!profile) return null;
     return {
       location: profile.location,
       email: profile.email,
+      phone: profile.phone,
+      socialLinksJson: profile.socialLinksJson,
     };
   } catch (error) {
     console.warn('Falling back to static photographer profile:', error);

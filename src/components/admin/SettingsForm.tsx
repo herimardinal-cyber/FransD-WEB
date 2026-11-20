@@ -32,6 +32,7 @@ export default function SettingsForm({
       initialSettings.meta_description ||
       'Official fine art and documentary photography portfolio of Frans Delian.',
     contact_email: initialSettings.contact_email || 'studio@fransdelian.com',
+    contact_phone: initialSettings.contact_phone || '+41 44 210 88 44',
     atelier_location: initialSettings.atelier_location || 'Zurich, Switzerland',
     social_instagram: initialSettings.social_instagram || 'https://instagram.com/fransdelian',
     social_behance: initialSettings.social_behance || 'https://behance.net/fransdelian',
@@ -550,11 +551,11 @@ export default function SettingsForm({
             </p>
           </div>
 
-          {/* Studio & Email */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Studio, Email & Phone */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
               <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Studio / Lokasi Atelier (Tampil di &quot;Studio: ...&quot;)
+                Lokasi Studio (Tampil di Contact & Footer)
               </label>
               <input
                 type="text"
@@ -564,13 +565,13 @@ export default function SettingsForm({
                 className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
               />
               <span className="text-[10px] text-[#666] font-mono mt-1 block">
-                Contoh: Zurich, Switzerland atau Aceh, Indonesia
+                Contoh: Limmatquai 44, 8001 Zurich atau Aceh, Indonesia
               </span>
             </div>
 
             <div>
               <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
-                Email Resmi Studio (Tampil di link footer)
+                Surat Elektronik / Email Studio
               </label>
               <input
                 type="email"
@@ -581,6 +582,22 @@ export default function SettingsForm({
               />
               <span className="text-[10px] text-[#666] font-mono mt-1 block">
                 Contoh: studio@fransdelian.com
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase font-mono tracking-wider text-[#A7A7A7] mb-2">
+                Telepon / Signal Studio
+              </label>
+              <input
+                type="text"
+                value={settings.contact_phone}
+                onChange={(e) => handleChange('contact_phone', e.target.value)}
+                placeholder="+41 44 210 88 44"
+                className="w-full bg-[#171717] border border-[#262626] focus:border-[#C6AA7B] text-[#F2EFE9] px-3 py-2 text-xs focus:outline-none font-mono"
+              />
+              <span className="text-[10px] text-[#666] font-mono mt-1 block">
+                Contoh: +41 44 210 88 44 atau +62 812...
               </span>
             </div>
           </div>

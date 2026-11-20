@@ -1,13 +1,45 @@
 'use client';
 
 import React from 'react';
-import { profile } from '@/data';
+import { profile as fallbackProfile } from '@/data';
 import ContactForm from '@/components/contact/ContactForm';
 import { useLanguage } from '@/context/LanguageContext';
-import { Mail, Phone, MapPin, Clock, ArrowUpRight } from 'lucide-react';
+import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 
-export default function ContactPageClient() {
+interface ContactPageClientProps {
+  profile?: {
+    email?: string;
+    phone?: string;
+    location?: string;
+    socialLinksJson?: string | null;
+  } | null;
+  settings?: Record<string, string>;
+}
+
+export default function ContactPageClient({ profile: profileData, settings }: ContactPageClientProps) {
   const { t, language } = useLanguage();
+
+  const studioEmail =
+    settings?.contact_email || profileData?.email || fallbackProfile.email || 'studio@fransdelian.com';
+  const studioPhone =
+    settings?.contact_phone || profileData?.phone || fallbackProfile.phone || '+41 44 210 88 44';
+  const studioLocation =
+    settings?.atelier_location || profileData?.location || fallbackProfile.location || 'Zurich, Switzerland';
+
+  // Dynamic social links
+  const socialList: { platform: string; url: string }[] = [];
+  const igUrl = settings?.social_instagram || 'https://instagram.com/fransdelian';
+  if (igUrl) socialList.push({ platform: 'Instagram', url: igUrl });
+  const pxUrl = settings?.social_500px || 'https://500px.com/fransdelian';
+  if (pxUrl) socialList.push({ platform: '500px', url: pxUrl });
+  const behanceUrl = settings?.social_behance || 'https://behance.net/fransdelian';
+  if (behanceUrl) socialList.push({ platform: 'Behance', url: behanceUrl });
+  const vscoUrl = settings?.social_vsco || 'https://vsco.co/fransdelian';
+  if (vscoUrl) socialList.push({ platform: 'VSCO', url: vscoUrl });
+  const linkedinUrl = settings?.social_linkedin;
+  if (linkedinUrl) socialList.push({ platform: 'LinkedIn', url: linkedinUrl });
+
+  const activeSocials = socialList.length > 0 ? socialList : fallbackProfile.socialLinks;
 
   return (
     <div className="pt-32 pb-24 sm:pb-32 bg-[#080808] min-h-screen text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
@@ -54,44 +86,34 @@ export default function ContactPageClient() {
                   <div>
                     <span className="text-[#717171] uppercase tracking-wider block mb-1">{t.contact.electronicMail}</span>
                     <a
-                      href={`mailto:${profile.email}`}
+                      href={`mailto:${studioEmail}`}
                       className="text-sm text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors"
                     >
-                      {profile.email}
+                      {studioEmail}
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <Phone className="w-4 h-4 text-[#C6AA7B] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-[#717171] uppercase tracking-wider block mb-1">{t.contact.telephone}</span>
-                    <a
-                      href={`tel:${profile.phone.replace(/\s+/g, '')}`}
-                      className="text-sm text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors"
-                    >
-                      {profile.phone}
-                    </a>
+                {studioPhone && (
+                  <div className="flex items-start gap-4">
+                    <Phone className="w-4 h-4 text-[#C6AA7B] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-[#717171] uppercase tracking-wider block mb-1">{t.contact.telephone}</span>
+                      <a
+                        href={`tel:${studioPhone.replace(/\s+/g, '')}`}
+                        className="text-sm text-[#F2EFE9] hover:text-[#C6AA7B] transition-colors"
+                      >
+                        {studioPhone}
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex items-start gap-4">
                   <MapPin className="w-4 h-4 text-[#C6AA7B] shrink-0 mt-0.5" />
                   <div>
                     <span className="text-[#717171] uppercase tracking-wider block mb-1">{t.contact.atelierLocation}</span>
-                    <span className="text-sm text-[#F2EFE9] block">Limmatquai 44</span>
-                    <span className="text-[#A7A7A7]">8001 Zurich, Switzerland</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Clock className="w-4 h-4 text-[#C6AA7B] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-[#717171] uppercase tracking-wider block mb-1">{t.contact.operatingHours}</span>
-                    <span className="text-sm text-[#F2EFE9] block">
-                      {language === 'id' ? 'Sen — Jum: 09:00 - 18:00 CET' : 'Mon — Fri: 09:00 - 18:00 CET'}
-                    </span>
-                    <span className="text-[#A7A7A7]">{t.contact.operatingDesc}</span>
+                    <span className="text-sm text-[#F2EFE9] block leading-snug whitespace-pre-line">{studioLocation}</span>
                   </div>
                 </div>
               </div>
@@ -103,7 +125,7 @@ export default function ContactPageClient() {
                 {language === 'id' ? 'Arsip & Jejaring Digital' : 'Digital Archives'}
               </span>
               <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                {profile.socialLinks.map((s) => (
+                {activeSocials.map((s) => (
                   <a
                     key={s.platform}
                     href={s.url}
@@ -181,4 +203,3 @@ export default function ContactPageClient() {
     </div>
   );
 }
-
