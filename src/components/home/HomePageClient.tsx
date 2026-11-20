@@ -29,6 +29,18 @@ export default function HomePageClient({
   const { t, language, formatDate } = useLanguage();
   const recentStories = stories.slice(0, 3);
 
+  const heroBgUrl =
+    settings?.home_hero_bg_url ||
+    'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=2400&q=90';
+  const isHeroBgExternal =
+    heroBgUrl.startsWith('http') && !heroBgUrl.includes('images.unsplash.com');
+
+  const ctaBgUrl =
+    settings?.home_cta_bg_url ||
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=2000&q=85';
+  const isCtaBgExternal =
+    ctaBgUrl.startsWith('http') && !ctaBgUrl.includes('images.unsplash.com');
+
   return (
     <div className="w-full bg-[#080808] text-[#F2EFE9] selection:bg-[#C6AA7B] selection:text-[#080808]">
       {/* ========================================================= */}
@@ -38,11 +50,12 @@ export default function HomePageClient({
         {/* Full-bleed Hero Photography */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=2400&q=90"
-            alt="Cinematic Icelandic highlands shrouded in morning mist"
+            src={heroBgUrl}
+            alt="Cinematic background photography"
             fill
             priority
             sizes="100vw"
+            unoptimized={isHeroBgExternal}
             className="object-cover object-center scale-105 animate-pulse-slow filter brightness-[0.8] contrast-[1.1]"
           />
           {/* Subtle Dark Vignette & Gradient Overlays */}
@@ -417,10 +430,11 @@ export default function HomePageClient({
       <section className="relative py-28 sm:py-36 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=2000&q=85"
+            src={ctaBgUrl}
             alt="Dramatic studio shadow and light"
             fill
             sizes="100vw"
+            unoptimized={isCtaBgExternal}
             className="object-cover filter brightness-[0.25] contrast-[1.2]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent" />
